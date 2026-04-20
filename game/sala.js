@@ -3,12 +3,15 @@ const Player = require('./players');
 const World = require('./world');
 
 
+
 class Sala {
     constructor() {
         this.players = new Map();
+        this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        //  game loop (30 FPS)
+        this.gameStarted = false;
+        //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
     }
 
@@ -16,8 +19,13 @@ class Sala {
     //******* JUGADORES
    
     addPlayer(id, nickname, ws) {
+        const nameTaken = Array.from(this.players.values()).some(p => p.nickname === nickname);
+        if (nameTaken) {
+            return { success: false, message: "El nickname ja existeix." };
+        }
+        
         if (this.players.size >= this.maxPlayers) {
-            return { success: false, message: "Sala llena" };
+            return { success: false, message: "Sala plena" };
         }
         // 1. Definim els punts de sortida
         const spawnPoints = [
@@ -92,6 +100,14 @@ class Sala {
   
 
     update() {
+        // Lógica de inicio de partida
+        if (!this.gameStarted && this.players.size >= this.minPlayers) {
+            this.gameStarted = true;
+            console.log("¡Partida iniciada!");
+        }
+
+        // Si la partida no ha empezado, no movemos a nadie
+        if (!this.gameStarted) return;
         for (const p of this.players.values()) {
             const prevX = p.x;
             const prevY = p.y;

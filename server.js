@@ -7,14 +7,14 @@ const sala = new Sala();
 console.log("Servidor en ws://localhost:3000");
 
 wss.on('connection', (ws) => {
-    console.log("Cliente conectado");
+    console.log("Conexió feta");
 
     let myId = null;
 
     ws.on('message', (message) => {
         let msg;
 
-        // ⚠️ evitar crash por JSON inválido
+        // vitar crash por JSON inválido
         try {
             msg = JSON.parse(message);
         } catch {
@@ -48,12 +48,11 @@ wss.on('connection', (ws) => {
 
 
         // INPUT
-    
         if (msg.type === "INPUT") {
             const player = sala.getPlayer(myId);
             if (!player) return;
 
-            // 👉 actualizar inputs
+            //  actualizar inputs
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
@@ -66,7 +65,7 @@ wss.on('connection', (ws) => {
 
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
 
-            console.log(`Jugador ${myId} desconectado`);
+            console.log(`Jugador ${nickname} desconectado`);
         }
     });
 });
