@@ -65,7 +65,7 @@ wss.on('connection', (ws) => {
 
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
 
-            console.log(`Jugador ${nickname} desconectado`);
+            console.log(`Jugador ${myId} desconectado`);
         }
     });
 });
