@@ -10,7 +10,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = false;
+        this.gameStarted = true;
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
     }
