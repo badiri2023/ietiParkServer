@@ -1,31 +1,59 @@
-class Players {
-    constructor(id, nickname) {
+class Player {
+    constructor(id, nickname, ws, startX, startY) {
         // Identificació
         this.id = id;
         this.nickname = nickname;
-        this.category = 'Junior'; // Valor per defecte (Punt 9 del teu projecte)
+        this.ws = ws;
+  
 
         // Posició (On està al món)
-        this.x = 100;
-        this.y = 100;
+        this.x = startX;
+        this.y = startY;
 
-        // Física (Per gestionar el moviment del punt 7)
+        // velocidad
         this.vx = 0; // Velocitat horitzontal
         this.vy = 0; // Velocitat vertical (gravetat)
-        this.speed = 5;
+      
+        this.input = {
+            left: false,
+            right: false,
+            jump: false
+        };
 
-        // Dimensions (Per calcular les col·lisions del punt 10)
-        this.width = 32;
-        this.height = 32;
+        this.onGround = true; // para salto simple
     }
 
-    // Aquest mètode és útil per si vols resetejar el jugador
-    resetPosition(x, y) {
-        this.x = x;
-        this.y = y;
-        this.vx = 0;
-        this.vy = 0;
+    // Actualización por tick
+    update() {
+        const speed = 5;
+        const gravity = 1;
+        const jumpForce = -15;
+
+        //  Movimiento horizontal
+        if (this.input.left) this.vx = -speed;
+        else if (this.input.right) this.vx = speed;
+        else this.vx = 0;
+
+        // Salto (solo si está en suelo)
+        if (this.input.jump && this.onGround) {
+            this.vy = jumpForce;
+            this.onGround = false;
+        }
+
+        //  Gravedad
+        this.vy += gravity;
+
+        //  Aplicar movimiento
+        this.x += this.vx;
+        this.y += this.vy;
+
+        //  Suelo simple (sin hitbox)
+        if (this.y >= 0) {
+            this.y = 0;
+            this.vy = 0;
+            this.onGround = true;
+        }
     }
 }
 
-module.exports = Player;
+module.exports = Player

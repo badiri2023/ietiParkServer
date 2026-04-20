@@ -1,39 +1,72 @@
-// server.js
 const WebSocket = require('ws');
 const Sala = require('./game/sala');
 
 const wss = new WebSocket.Server({ port: 3000 });
-const partida = new Sala();
+const sala = new Sala();
 
-console.log("Servidor iniciado en puerto 3000...");
+console.log("Servidor en ws://localhost:3000");
 
 wss.on('connection', (ws) => {
-    console.log('client conectat')
-    let myId = null;
-    //recibimos mensajes del cliente
-    ws.on('message', (message) => {
-        const msg = JSON.parse(message);
+    console.log("Cliente conectado");
 
-        // Cuando el cliente se presenta (Punt 4: Pantalla de inicio)
-        if (msg.type === 'JOIN') {
-            myId = Date.now().toString(); // ID único
-            const result = partida.addPlayer(myId, msg.nickname, ws);
-            
-            if (result.success) {
-                console.log(`Jugador unido: ${msg.nickname}`);
-                // Avisamos a todos los clientes que hay un nuevo jugador
-                partida.broadcast('PLAYER_LIST', partida.getPlayerList());
-            } else {
-                ws.send(JSON.stringify({ type: 'ERROR', message: result.message }));
+    let myId = null;
+
+    ws.on('message', (message) => {
+        let msg;
+
+        // ⚠️ evitar crash por JSON inválido
+        try {
+            msg = JSON.parse(message);
+        } catch {
+            console.log(" JSON inválido");
+            return;
+        }
+        // JOIN
+      
+        if (msg.type === "JOIN") {
+            myId = Math.random().toString(36).substring(2, 10);
+
+            const result = sala.addPlayer(myId, msg.nickname, ws);
+
+            if (!result.success) {
+                ws.send(JSON.stringify({
+                    type: "ERROR",
+                    message: result.message
+                }));
+                return;
             }
+
+            console.log(`${msg.nickname} unido`);
+
+            ws.send(JSON.stringify({
+                type: "WELCOME",
+                id: myId
+            }));
+
+            sala.broadcast("PLAYER_LIST", sala.getPlayerList());
+        }
+
+
+        // INPUT
+    
+        if (msg.type === "INPUT") {
+            const player = sala.getPlayer(myId);
+            if (!player) return;
+
+            // 👉 actualizar inputs
+            player.input.left = msg.left;
+            player.input.right = msg.right;
+            player.input.jump = msg.jump;
         }
     });
 
     ws.on('close', () => {
         if (myId) {
-            partida.removePlayer(myId);
-            partida.broadcast('PLAYER_LIST', partida.getPlayerList());
-            console.log("Jugador desconectado");
+            sala.removePlayer(myId);
+
+            sala.broadcast("PLAYER_LIST", sala.getPlayerList());
+
+            console.log(`Jugador ${myId} desconectado`);
         }
     });
 });

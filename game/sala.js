@@ -1,22 +1,37 @@
-// game/sala.js
+const WebSocket = require('ws');
+const Player = require('./players');
+const World = require('./world');
+
+
 class Sala {
     constructor() {
-        this.players = new Map(); // Guardaremos los jugadores aquí (ID -> Datos)
+        this.players = new Map();
+        this.maxPlayers = 8;
+        this.world = new World();
+        //  game loop (30 FPS)
+        this.interval = setInterval(() => this.update(), 1000 / 30);
     }
 
-    // Método para añadir un jugador cuando se conecta
-    addPlayer(id, nickname, socket) {
-        if (this.players.size >= 8) {
+    
+    //******* JUGADORES
+   
+    addPlayer(id, nickname, ws) {
+        if (this.players.size >= this.maxPlayers) {
             return { success: false, message: "Sala llena" };
         }
-        
-        this.players.set(id, {
-            id: id,
-            nickname: nickname,
-            socket: socket, // Guardamos la conexión para hablarle
-            x: 0, y: 0      // Posición inicial
-        });
-        
+        // 1. Definim els punts de sortida
+        const spawnPoints = [
+            { x: 100, y: 0 },
+            { x: 200, y: 0 },
+            { x: 300, y: 0 },
+            { x: 400, y: 0 } 
+        ];
+        //Calculem on ha d'aparèixer segons quants jugadors hi ha
+        const spawn = spawnPoints[this.players.size % spawnPoints.length];
+
+        const player = new Player(id, nickname, ws, spawn.x, spawn.y);
+        this.players.set(id, player);
+
         return { success: true };
     }
 
@@ -24,22 +39,102 @@ class Sala {
         this.players.delete(id);
     }
 
-    // Preparamos la lista para enviarla al menú (Punt 4)
+    getPlayer(id) {
+        return this.players.get(id);
+    }
+
     getPlayerList() {
         return Array.from(this.players.values()).map(p => ({
             id: p.id,
             nickname: p.nickname
         }));
     }
+        // jugador vs obstáculo
+    isColliding(player, rect) {
+        const size = 40; // tamaño jugador
 
-    // Enviar mensaje a TODOS los conectados
+        return (
+            player.x < rect.x + rect.width &&
+            player.x + size > rect.x &&
+            player.y < rect.y + rect.height &&
+            player.y + size > rect.y
+        );
+    }
+
+    // jugador vs jugador
+    isPlayerColliding(a, b) {
+        const size = 40;
+
+        return (
+            a.x < b.x + size &&
+            a.x + size > b.x &&
+            a.y < b.y + size &&
+            a.y + size > b.y
+        );
+    }
+        
+
+    // ***NETWORK
+
+
     broadcast(type, data) {
-        const payload = JSON.stringify({ type, data });
-        this.players.forEach(player => {
-            if (player.socket.readyState === 1) { // 1 = OPEN
-                player.socket.send(payload);
+        const msg = JSON.stringify({ type, data });
+
+        for (const p of this.players.values()) {
+            if (p.ws.readyState === WebSocket.OPEN) {
+                p.ws.send(msg);
             }
-        });
+        }
+    }
+
+
+    // ****GAME LOOP
+  
+
+    update() {
+        for (const p of this.players.values()) {
+            const prevX = p.x;
+            const prevY = p.y;
+
+            p.update(); // Actualizamos físicas
+
+            // 1. Colisión con obstáculos
+            for (const obs of this.world.obstacles) {
+                if (this.isColliding(p, obs)) {
+                    p.x = prevX;
+                    p.y = prevY;
+                }
+            }
+
+            // 2. Colisión con puerta
+            if (this.isColliding(p, this.world.door)) {
+                p.x = prevX;
+                p.y = prevY;
+                p.vx = 0; // Cambiado de p.pv a p.vx para detener movimiento
+            }
+
+            // 3. Colisión con otros jugadores (AHORA ESTÁ DENTRO DEL BUCLE)
+            for (const other of this.players.values()) {
+                if (p.id === other.id) continue; // No chocamos contra nosotros mismos
+
+                if (this.isPlayerColliding(p, other)) {
+                    p.x = prevX;
+                    p.y = prevY;
+                }
+            }
+        }
+
+        this.broadcast("STATE_UPDATE", this.getState());
+    }
+    getState() {
+            return {players:Array.from(this.players.values()).map(p => ({
+                id: p.id,
+                x: p.x,
+                y: p.y
+            })),
+            obstacles:this.world.obstacles,
+            door: this.world.door
+        };
     }
 }
 
