@@ -121,7 +121,8 @@ class Sala {
                 x: p.x,
                 y: p.y,
                 color: p.color,
-                nickname: p.nickname
+                nickname: p.nickname,
+                moving: p.isMoving
             }))
         };
     }

@@ -26,33 +26,40 @@ class Player {
     // Actualización por tick
     update() {
         const speed = 5;
-        const gravity = 1;
-        const jumpForce = -15;
+        const gravity = -0.8;  // Negativo para que tire hacia abajo la gravedad
+        const jumpForce = 15;  // Positivo para que salte hacia arriba el pj
+        const playerWidth = 40;
+        const playerHeight = 40;
 
-        //  Movimiento horizontal
+        // 1. Movimiento horizontal
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
         else this.vx = 0;
 
-        // Salto (solo si está en suelo)
+        // 2. Salto (solo si está en el suelo)
         if (this.input.jump && this.onGround) {
-            this.vy = jumpForce;
+            this.vy = jumpForce; 
             this.onGround = false;
         }
 
-        //  Gravedad
+        // 3. Aplicar físicas
         this.vy += gravity;
-
-        //  Aplicar movimiento
         this.x += this.vx;
         this.y += this.vy;
 
-        //  Suelo simple (sin hitbox)
-        if (this.y >= 0) {
+        // --- LÍMITES DEL MAPA (700x500) ---
+        // Suelo (Y = 0)
+        if (this.y < 0) {
             this.y = 0;
             this.vy = 0;
             this.onGround = true;
         }
+        // Paredes (X)
+        if (this.x < 0) this.x = 0;
+        if (this.x > 700 - playerWidth) this.x = 700 - playerWidth;
+
+        // Guardar si se está moviendo para la animación
+        this.isMoving = (this.vx !== 0);
     }
 }
 
