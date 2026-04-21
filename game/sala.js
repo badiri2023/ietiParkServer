@@ -43,7 +43,7 @@ class Sala {
         return { success: true };
     }
 
-    removePlayer(idz) {
+    removePlayer(id) {
         this.players.delete(id);
     }
 
