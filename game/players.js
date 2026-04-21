@@ -1,12 +1,10 @@
 class Player {
     ///tambien tiene que tener un color 
-    constructor(id, nickname, ws, startX, startY) {
+    constructor(id, nickname, ws, startX, startY, color) {
         // Identificació
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
-  
-
         // Posició (On està al món)
         this.x = startX;
         this.y = startY;

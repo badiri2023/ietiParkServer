@@ -84,8 +84,6 @@ class Sala {
     }
 
 
-
-
         // **********colisiones***********
     isColliding(player, rect) {
         const size = 40; // tamaño jugador
