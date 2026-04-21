@@ -147,21 +147,23 @@ class Sala {
             const prevX = p.x;
             const prevY = p.y;
 
-            p.update(); // Actualizamos físicas
+            p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
             // 1. Colisión con obstáculos
             for (const obs of this.world.obstacles) {
                 if (this.isColliding(p, obs)) {
                     p.x = prevX;
                     p.y = prevY;
+             
                 }
             }
 
-            // 2. Colisión con puerta
+            // 2. Colisión con puerta impide avanzar P,10
             if (this.isColliding(p, this.world.door)) {
                 p.x = prevX;
                 p.y = prevY;
                 p.vx = 0; // Cambiado de p.pv a p.vx para detener movimiento
+                
             }
 
             // 3. Colisión con otros jugadores (AHORA ESTÁ DENTRO DEL BUCLE)
@@ -175,7 +177,7 @@ class Sala {
             }
         }
 
-        this.broadcast("STATE_UPDATE", this.getState());
+        this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     
 }
