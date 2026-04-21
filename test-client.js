@@ -8,7 +8,7 @@ ws.on('open', () => {
    
     
     // Simular un JOIN
-    ws.send(JSON.stringify({ type: 'JOIN', nickname: 'JugadorTest' }));
+    ws.send(JSON.stringify({ type: 'JOIN', nickname: 'jugadortest' }));
     
     // Simular movimiento (presionar derecha) cada 100ms
     setInterval(() => {

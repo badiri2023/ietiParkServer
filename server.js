@@ -9,11 +9,6 @@ console.log("Servidor en ws://localhost:3000");
 wss.on('connection', (ws) => {
     console.log("Conexió feta");
 
-    ws.send(JSON.stringify({
-        type: "PLAYER_LIST",
-        data: sala.getPlayerList() 
-    }));
-
     let myId = null;
 
 
@@ -63,6 +58,7 @@ wss.on('connection', (ws) => {
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
+            console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
         }
     });
 
