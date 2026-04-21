@@ -11,6 +11,8 @@ wss.on('connection', (ws) => {
     console.log("Conexió feta");
 
     let myId = null;
+    ws.isViewer = false;
+
 
 
     ws.on('message', (message) => {
@@ -29,9 +31,10 @@ wss.on('connection', (ws) => {
 
             ws.isViewer = true;
 
-            console.log("👁 Viewer conectado");
+            console.log(" Flutter conectado");
+            sala.viewers.add(ws);
 
-            // 🌍 enviar mundo inicial
+            //  enviar mundo inicial
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
                 data: {
@@ -50,15 +53,6 @@ wss.on('connection', (ws) => {
 
             return;
         }
-
-
-
-
-
-
-
-
-
 
 
         // Player JOIN
@@ -111,7 +105,7 @@ wss.on('connection', (ws) => {
             console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
         }
     });
-
+    //*******desconexión
     ws.on('close', () => {
         if (myId) {
             const player = sala.getPlayer(myId);
