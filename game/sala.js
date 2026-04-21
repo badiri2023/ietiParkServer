@@ -37,10 +37,10 @@ class Sala {
 
         // 1. Definim els punts de sortida
         const spawnPoints = [
-            { x: 100, y: 0 },
-            { x: 200, y: 0 },
-            { x: 300, y: 0 },
-            { x: 400, y: 0 } 
+            { x: 70, y: 350 },
+            { x: 100, y: 350 },
+            { x: 130, y: 350 },
+            { x: 160, y: 350 }
         ];
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
