@@ -45,7 +45,7 @@ wss.on('connection', (ws) => {
                 }
             }));
 
-            //  estado inicial
+            //estado inicial
             ws.send(JSON.stringify({
                 type: "STATE_UPDATE",
                 data: sala.getState()

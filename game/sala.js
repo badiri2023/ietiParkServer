@@ -136,7 +136,12 @@ class Sala {
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
             console.log("¡Partida iniciada!");
-        }
+            console.log("======================");
+            console.log("WORLD TRIPLE AAA INIT");
+            console.log(` Tamaño: ${sala.world.width}x${sala.world.height}`);
+            console.log(`Puerta en (${sala.world.door.x}, ${sala.world.door.y})`);
+            console.log("======================");
+            }
 
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
