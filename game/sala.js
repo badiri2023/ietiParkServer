@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const Player = require('./players');
 const World = require('./world');
+const COLORS = require('./colors');
 
 
 
@@ -11,22 +12,29 @@ class Sala {
         this.maxPlayers = 8;
         this.world = new World();
         this.gameStarted = true;
+        this.viewers = new Set();
+        this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
     }
 
     
-    //******* JUGADORES
+    //******* JUGADORES********
    
     addPlayer(id, nickname, ws) {
         const nameTaken = Array.from(this.players.values()).some(p => p.nickname === nickname);
         if (nameTaken) {
-            return { success: false, message: "El nickname ja existeix." };
+            return { success: false, message: "El nickname ya existe" };
         }
         
         if (this.players.size >= this.maxPlayers) {
             return { success: false, message: "Sala plena" };
         }
+        if (this.availableColors.length === 0) 
+            return { success: false, message: "No hay colores disponibles" };
+        //asigno color
+        const color = this.availableColors.shift();
+
         // 1. Definim els punts de sortida
         const spawnPoints = [
             { x: 100, y: 0 },
@@ -37,14 +45,19 @@ class Sala {
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
 
-        const player = new Player(id, nickname, ws, spawn.x, spawn.y);
+        const player = new Player(id, nickname, ws, spawn.x, spawn.y, color);
         this.players.set(id, player);
 
         return { success: true };
     }
 
     removePlayer(id) {
-        this.players.delete(id);
+        const player = this.players.get(id);
+        if (player) {
+            // RECICLAJE: Devolvemos el color al banco
+            this.availableColors.push(player.color);
+            this.players.delete(id);
+        }
     }
 
     getPlayer(id) {
@@ -57,7 +70,23 @@ class Sala {
             nickname: p.nickname
         }));
     }
-        // jugador vs obstáculo
+
+    // **********broadcast***********
+
+    broadcast(type, data) {
+        const msg = JSON.stringify({ type, data });
+
+        for (const p of this.players.values()) {
+            if (p.ws.readyState === WebSocket.OPEN) {
+                p.ws.send(msg);
+            }
+        }
+    }
+
+
+
+
+        // **********colisiones***********
     isColliding(player, rect) {
         const size = 40; // tamaño jugador
 
@@ -80,25 +109,30 @@ class Sala {
             a.y + size > b.y
         );
     }
-        
-
-    // ***NETWORK
-
-
-    broadcast(type, data) {
-        const msg = JSON.stringify({ type, data });
-
-        for (const p of this.players.values()) {
-            if (p.ws.readyState === WebSocket.OPEN) {
-                p.ws.send(msg);
-            }
-        }
+    //estado del juego
+     getState() {
+        return {
+            world: {
+                width: this.world.width,
+                height: this.world.height,
+                obstacles: this.world.obstacles,
+                door: this.world.door
+            },
+            players: Array.from(this.players.values()).map(p => ({
+                id: p.id,
+                x: p.x,
+                y: p.y,
+                color: p.color,
+                nickname: p.nickname
+            }))
+        };
     }
+
 
 
     // ****GAME LOOP
   
-
+    
     update() {
         // Lógica de inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
@@ -145,16 +179,7 @@ class Sala {
 
         this.broadcast("STATE_UPDATE", this.getState());
     }
-    getState() {
-            return {players:Array.from(this.players.values()).map(p => ({
-                id: p.id,
-                x: p.x,
-                y: p.y
-            })),
-            obstacles:this.world.obstacles,
-            door: this.world.door
-        };
-    }
+    
 }
 
 module.exports = Sala;

@@ -1,4 +1,5 @@
 class Player {
+    ///tambien tiene que tener un color 
     constructor(id, nickname, ws, startX, startY) {
         // Identificació
         this.id = id;
@@ -13,6 +14,7 @@ class Player {
         // velocidad
         this.vx = 0; // Velocitat horitzontal
         this.vy = 0; // Velocitat vertical (gravetat)
+        this.color = color;
       
         this.input = {
             left: false,

@@ -1,28 +1,20 @@
 const WebSocket = require('ws');
 const Sala = require('./game/sala');
 
-const wss = new WebSocket.Server({ port: 3000 });
+const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 const sala = new Sala();
 
-console.log("Servidor en ws://localhost:3000");
+console.log("Servidor en ws://0.0.0.0:3000");
 
-wss.on('connection', (ws) => {
-    console.log("Conexió feta");
-
-    // 1. ENVIAR LA LLISTA NOMÉS EN CONNECTAR-SE
-    // Això envia la llista només al nou client que acaba d'arribar
-    ws.send(JSON.stringify({
-        type: "PLAYER_LIST",
-        data: sala.getPlayerList() 
-    }));
+wss.on('connection', (ws) => {  // Aquí debe ser ws, no wss
+    console.log("Conexión hecha");
 
     let myId = null;
 
     ws.on('message', (message) => {
         let msg;
-        
-        // [ELIMINAT] Aquí ja no enviem PLAYER_LIST, era redundant!
 
+        // Evitar crash por JSON inválido
         try {
             msg = JSON.parse(message);
         } catch {
@@ -33,18 +25,24 @@ wss.on('connection', (ws) => {
         // JOIN
         if (msg.type === "JOIN") {
             myId = Math.random().toString(36).substring(2, 10);
+
             const result = sala.addPlayer(myId, msg.nickname, ws);
 
             if (!result.success) {
-                ws.send(JSON.stringify({ type: "ERROR", message: result.message }));
+                ws.send(JSON.stringify({
+                    type: "ERROR",
+                    message: result.message
+                }));
                 return;
             }
 
             console.log(`${msg.nickname} unido`);
-            ws.send(JSON.stringify({ type: "WELCOME", id: myId }));
 
-            // 2. AVISAR A TOTHOM QUE HA ENTRAT UN NOU
-            // Només fem broadcast quan canvia l'estat de la sala
+            ws.send(JSON.stringify({
+                type: "WELCOME",
+                id: myId
+            }));
+
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
         }
 
@@ -53,40 +51,27 @@ wss.on('connection', (ws) => {
             const player = sala.getPlayer(myId);
             if (!player) return;
 
+            // actualizar inputs
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
+            console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
         }
     });
 
     ws.on('close', () => {
         if (myId) {
+            const player = sala.getPlayer(myId);
+            const nickName = player ? player.nickname : "Desconocido";
             sala.removePlayer(myId);
-            // 3. AVISAR A TOTHOM QUE HA SORTIT
+            sala.broadcast("PLAYER_LEFT", {
+                id: myId,
+                nickname: nickName
+            });
+
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
-            console.log(`Jugador ${myId} desconectado`);
+
+            console.log(`Jugador ${nickName} desconectado`);
         }
     });
-});
-ws.on('close', () => {
-    if (myId) {
-        // 1. Buscamos al jugador antes de eliminarlo para saber su nombre
-        const player = sala.getPlayer(myId);
-        const nickName = player ? player.nickname : "Desconocido";
-
-        // 2. Eliminamos al jugador
-        sala.removePlayer(myId);
-
-        // 3. Avisamos a los demás usando su NICKNAME (mejor UX)
-        // Puedes enviar un mensaje específico de desconexión
-        sala.broadcast("PLAYER_LEFT", {
-            id: myId,
-            nickname: nickName
-        });
-
-        // 4. Actualizamos la lista general
-        sala.broadcast("PLAYER_LIST", sala.getPlayerList());
-
-        console.log(`Jugador ${nickName} (${myId}) desconectado`);
-    }
 });

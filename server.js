@@ -23,7 +23,45 @@ wss.on('connection', (ws) => {
             console.log(" JSON inválido");
             return;
         }
-        // JOIN
+
+        //Fluter 
+        if (msg.type === "JOIN_VIEWER") {
+
+            ws.isViewer = true;
+
+            console.log("👁 Viewer conectado");
+
+            // 🌍 enviar mundo inicial
+            ws.send(JSON.stringify({
+                type: "WORLD_INIT",
+                data: {
+                    width: sala.world.width,
+                    height: sala.world.height,
+                    obstacles: sala.world.obstacles,
+                    door: sala.world.door
+                }
+            }));
+
+            // 🎮 estado inicial
+            ws.send(JSON.stringify({
+                type: "STATE_UPDATE",
+                data: sala.getState()
+            }));
+
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        // Player JOIN
       
         if (msg.type === "JOIN") {
             myId = Math.random().toString(36).substring(2, 10);
@@ -39,10 +77,21 @@ wss.on('connection', (ws) => {
             }
 
             console.log(`${msg.nickname} unido`);
+            ///inicio mapa
+            ws.send(JSON.stringify({
+                type: "WORLD_INIT",
+                data: {
+                    width: sala.world.width,
+                    height: sala.world.height,
+                    obstacles: sala.world.obstacles,
+                    door: sala.world.door
+                }
+            }));
 
             ws.send(JSON.stringify({
                 type: "WELCOME",
-                id: myId
+                id: myId,
+                nickname: msg.nickname //recordar a Bad que cambie que reciba  un name
             }));
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
 
@@ -77,5 +126,8 @@ wss.on('connection', (ws) => {
 
             console.log(`Jugador ${nickName} desconectado`);
         }
+    });
+     ws.on('error', (err) => {
+        console.log("Error en conexión:", err.message);
     });
 });
