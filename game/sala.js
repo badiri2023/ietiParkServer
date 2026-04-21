@@ -43,7 +43,7 @@ class Sala {
         return { success: true };
     }
 
-    removePlayer(id) {
+    removePlayer(idz) {
         this.players.delete(id);
     }
 
@@ -108,6 +108,9 @@ class Sala {
 
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
+
+
+        
         for (const p of this.players.values()) {
             const prevX = p.x;
             const prevY = p.y;
