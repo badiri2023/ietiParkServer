@@ -11,7 +11,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = false; //true para pruebas 
+        this.gameStarted = true; //true para pruebas 
         this.viewers = new Set();
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
@@ -37,12 +37,12 @@ class Sala {
 
         // 1. Definim els punts de sortida
         const spawnPoints = [
-             { x: 70, y: 350 },
-            { x: 120, y: 350 },
-            { x: 170, y: 350 },
-            { x: 220, y: 350 },
-            { x: 270, y: 350 },
-            { x: 320, y: 350 },
+             { x: 70, y: 500 },
+            { x: 120, y: 500 },
+            { x: 170, y: 500 },
+            { x: 220, y: 500 },
+            { x: 270, y: 500 },
+            { x: 320, y: 500 },
             { x: 370, y: 350 },
             { x: 420, y: 350 }
         ];
@@ -51,7 +51,7 @@ class Sala {
         //creo el jugador
         const player = new Player(id, nickname, ws, spawn.x, spawn.y, color);
         this.players.set(id, player);
-        console.log(` ${nickname} con  color ${color}`);
+        console.log(`${nickname} tiene asignado el color ${color}`);
 
 
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
