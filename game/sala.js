@@ -11,7 +11,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = true; //true para pruebas 
+        this.gameStarted = false; //true para pruebas 
         this.viewers = new Set();
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
@@ -130,7 +130,7 @@ class Sala {
             a.y + size > b.y
         );
     }
-    // mudo actualizado 
+    // mundo actualizado 
     getWorldData() {
     return {
         width: this.world.width,
