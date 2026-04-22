@@ -179,7 +179,6 @@ class Sala {
         // Lógica de inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
-            this.broadcast("WORLD_INIT", this.world);
             this.broadcast("GAME_START", {});
             }
 
