@@ -26,7 +26,7 @@ wss.on('connection', (ws) => {
             return;
         }
 
-        //Fluter 
+        //Fluter observador
         if (msg.type === "JOIN_VIEWER") {
 
             ws.isViewer = true;
@@ -34,16 +34,6 @@ wss.on('connection', (ws) => {
             console.log(" Flutter conectado");
             sala.viewers.add(ws);
 
-            //  enviar mundo inicial
-            ws.send(JSON.stringify({
-                type: "WORLD_INIT",
-                data: {
-                    width: sala.world.width,
-                    height: sala.world.height,
-                    obstacles: sala.world.obstacles,
-                    door: sala.world.door
-                }
-            }));
 
             //estado inicial
             ws.send(JSON.stringify({
@@ -69,17 +59,9 @@ wss.on('connection', (ws) => {
                 }));
                 return;
             }
-
-            console.log(`${msg.nickname} unido`);
-            ///inicio mapa
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
-                data: {
-                    width: sala.world.width,
-                    height: sala.world.height,
-                    obstacles: sala.world.obstacles,
-                    door: sala.world.door
-                }
+                data: sala.getWorldData() // Usamos el nuevo método
             }));
 
             ws.send(JSON.stringify({
@@ -88,7 +70,8 @@ wss.on('connection', (ws) => {
                 nickname: msg.nickname //recordar a Bad que cambie que reciba  un name
             }));
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
-
+            console.log(`${msg.nickname} unido`);
+            return;
             
         }
 
@@ -107,6 +90,10 @@ wss.on('connection', (ws) => {
     });
     //*******desconexión
     ws.on('close', () => {
+        if (ws.isViewer) {
+            sala.removeViewer(ws);
+            return;
+        }
         if (myId) {
             const player = sala.getPlayer(myId);
             const nickName = player ? player.nickname : "Desconocido";

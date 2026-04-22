@@ -11,7 +11,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = true;
+        this.gameStarted = false; //true para pruebas 
         this.viewers = new Set();
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
@@ -37,24 +37,34 @@ class Sala {
 
         // 1. Definim els punts de sortida
         const spawnPoints = [
-            { x: 70, y: 350 },
-            { x: 100, y: 350 },
-            { x: 130, y: 350 },
-            { x: 160, y: 350 }
+             { x: 70, y: 350 },
+            { x: 120, y: 350 },
+            { x: 170, y: 350 },
+            { x: 220, y: 350 },
+            { x: 270, y: 350 },
+            { x: 320, y: 350 },
+            { x: 370, y: 350 },
+            { x: 420, y: 350 }
         ];
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
 
         const player = new Player(id, nickname, ws, spawn.x, spawn.y, color);
         this.players.set(id, player);
+        console.log(` ${nickname} se te ha asignado el color ${color}`);
 
-        return { success: true };
+        return {
+            success: true,
+            player,
+            world: this.world
+        };
     }
 
     removePlayer(id) {
         const player = this.players.get(id);
         if (player) {
             // RECICLAJE: Devolvemos el color al banco
+            console.log(`${player.nickname} se ha  desconectado`);
             this.availableColors.push(player.color);
             this.players.delete(id);
         }
@@ -79,6 +89,11 @@ class Sala {
         for (const p of this.players.values()) {
             if (p.ws.readyState === WebSocket.OPEN) {
                 p.ws.send(msg);
+            }
+        }
+         for (const v of this.viewers) {
+            if (v.readyState === WebSocket.OPEN) {
+                v.send(msg);
             }
         }
     }
@@ -107,26 +122,54 @@ class Sala {
             a.y + size > b.y
         );
     }
+    // mudo actualizado 
+    getWorldData() {
+    return {
+        width: this.world.width,
+        height: this.world.height,
+        obstacles: this.world.obstacles,
+        door: this.world.door
+    };
+}
     //estado del juego
-     getState() {
+    getState() {
         return {
-            world: {
-                width: this.world.width,
-                height: this.world.height,
-                obstacles: this.world.obstacles,
-                door: this.world.door
-            },
             players: Array.from(this.players.values()).map(p => ({
                 id: p.id,
                 x: p.x,
                 y: p.y,
-                color: p.color,
                 nickname: p.nickname,
-                moving: p.isMoving
+                color: p.color
             }))
         };
     }
+    //flutter 
 
+   addViewer(ws) {
+        this.viewers.add(ws);
+
+        console.log("Observador conectado");
+
+        ws.send(JSON.stringify({
+            type: "WORLD_INIT",
+            data: {
+                width: this.world.width,
+                height: this.world.height,
+                obstacles: this.world.obstacles,
+                door: this.world.door
+            }
+        }));
+
+        ws.send(JSON.stringify({
+            type: "STATE_UPDATE",
+            data: this.getState()
+        }));
+    }
+
+    removeViewer(ws) {
+        this.viewers.delete(ws);
+        console.log("Observador desconectado");
+    }
 
 
     // ****GAME LOOP
@@ -136,12 +179,8 @@ class Sala {
         // Lógica de inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
-            console.log("¡Partida iniciada!");
-            console.log("======================");
-            console.log("WORLD TRIPLE AAA INIT");
-            console.log(` Tamaño: ${sala.world.width}x${sala.world.height}`);
-            console.log(`Puerta en (${sala.world.door.x}, ${sala.world.door.y})`);
-            console.log("======================");
+            this.broadcast("WORLD_INIT", this.world);
+            this.broadcast("GAME_START", {});
             }
 
         // Si la partida no ha empezado, no movemos a nadie
