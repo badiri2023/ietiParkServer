@@ -28,12 +28,13 @@ wss.on('connection', (ws) => {
 
         //Fluter observador
         if (msg.type === "JOIN_VIEWER") {
-
             ws.isViewer = true;
-
-            console.log(" Flutter conectado");
+            console.log("Observador  conectado");
             sala.viewers.add(ws);
-
+            ws.send(JSON.stringify({
+                type: "WORLD_INIT",
+                data: sala.getWorldData() 
+            }));
 
             //estado inicial
             ws.send(JSON.stringify({
@@ -59,11 +60,7 @@ wss.on('connection', (ws) => {
                 }));
                 return;
             }
-            ws.send(JSON.stringify({
-                type: "WORLD_INIT",
-                data: sala.getWorldData() // Usamos el nuevo método
-            }));
-
+            
             ws.send(JSON.stringify({
                 type: "WELCOME",
                 id: myId,

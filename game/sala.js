@@ -11,7 +11,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = true; //true para pruebas 
+        this.gameStarted = false; //true para pruebas 
         this.viewers = new Set();
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
@@ -48,17 +48,25 @@ class Sala {
         ];
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
-
+        //creo el jugador
         const player = new Player(id, nickname, ws, spawn.x, spawn.y, color);
         this.players.set(id, player);
-        console.log(` ${nickname} se te ha asignado el color ${color}`);
+        console.log(` ${nickname} con  color ${color}`);
 
-        return {
-            success: true,
-            player,
-            world: this.world
-        };
-    }
+
+        // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
+        if (this.gameStarted) {
+            ws.send(JSON.stringify({
+                type: "WORLD_INIT",
+                data: this.getWorldData() // Usamos el método que separamos antes
+            }));
+        } else {
+            // Opcional: Avisar al cliente que está en modo espera
+            ws.send(JSON.stringify({ type: "WAITING", message: "Esperando jugadores..." }));
+        }
+
+        return { success: true, player };
+        }
 
     removePlayer(id) {
         const player = this.players.get(id);
@@ -179,8 +187,12 @@ class Sala {
         // Lógica de inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
+            console.log("¡Partida iniciada! Enviando mundo a todos.");
+            //se envia el mundo cuando esten todoss
+            const worldData = this.getWorldData();
+            this.broadcast("WORLD_INIT", worldData);
             this.broadcast("GAME_START", {});
-            }
+        }
 
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
