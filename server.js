@@ -82,7 +82,7 @@ wss.on('connection', (ws) => {
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
-            console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
+            //console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
         }
     });
     //*******desconexión
