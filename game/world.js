@@ -1,3 +1,4 @@
+const levelData = require('./level.json');
 class World {
     //tamaño del mapa
     constructor() {

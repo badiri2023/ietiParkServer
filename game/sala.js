@@ -11,7 +11,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = true; //true para pruebas 
+        this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
