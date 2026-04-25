@@ -1,17 +1,41 @@
 const levelData = require('./level.json');
 class World {
-    //tamaño del mapa
     constructor() {
-        // Aseguramos que sea un array para evitar el error "is not iterable"
-        this.width = 800;
+        const level = levelData.levels[0];
+
+        // Tamaño (puedes ajustar esto luego)
+        this.width = 700;
         this.height = 500;
-        this.obstacles = [
-            { x: 200, y: 300, width: 200, height: 20 },
-            { x: 400, y: 150, width: 50, height: 200 }
-        ];
-        
-        this.door = { x: 618, y: 280, width: 266, height: 310 };
-        //this.key = {}
+
+        // PUERTA
+        const doorSprite = level.sprites.find(s => s.type === "door");
+
+        this.door = {
+            x: doorSprite.x,
+            y: doorSprite.y,
+            width: doorSprite.width,
+            height: doorSprite.height
+        };
+
+        //  SPAWNS (jugadores)
+        this.spawns = level.sprites
+            .filter(s => s.type === "player1")
+            .map(s => ({
+                x: s.x,
+                y: s.y
+            }));
+
+        //  OBSTÁCULOS (por ahora vacío)
+        this.obstacles = [];
+
+        this.key = {
+            x: 200,
+            y: 300,
+            width: 30,
+            height: 30,
+            collected: false
+        };
     }
 }
+
 module.exports = World;
