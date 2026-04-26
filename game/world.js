@@ -9,12 +9,14 @@ class World {
 
         // PUERTA
         const doorSprite = level.sprites.find(s => s.type === "door");
+        const keySprite = level.sprites.find(s =>type ==="key")
 
         this.door = {
             x: doorSprite.x,
             y: doorSprite.y,
             width: doorSprite.width,
-            height: doorSprite.height
+            height: doorSprite.height,
+            opened :false
         };
 
         //  SPAWNS (jugadores)
@@ -33,7 +35,8 @@ class World {
             y: 300,
             width: 30,
             height: 30,
-            collected: false
+            collected: false,
+            holderId: null
         };
     }
 }

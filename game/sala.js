@@ -220,9 +220,7 @@ class Sala {
 
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
-
-
-        
+ 
         for (const p of this.players.values()) {
             const prevX = p.x;
             const prevY = p.y;
@@ -270,17 +268,6 @@ class Sala {
                     p.x = prevX;
                     p.y = prevY;
                 }
-            }
-            //  COLISIÓN CON LLAVE
-            if (!this.world.key.collected && this.isColliding(p, this.world.key)) {
-                this.world.key.collected = true;
-                this.world.key.holderId = p.id;
-
-                console.log(`${p.nickname} ha cogido la llave`);
-
-                this.broadcast("KEY_COLLECTED", {
-                    playerId: p.id
-                });
             }
         }
 
