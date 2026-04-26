@@ -15,7 +15,7 @@ class Sala {
         this.viewers = new Set();
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
-        this.interval = setInterval(() => this.update(), 1000 / 80);
+        this.interval = setInterval(() => this.update(), 1000 / 30);
     }
 
     
@@ -34,9 +34,10 @@ class Sala {
             return { success: false, message: "No hay colores disponibles" };
         //asigno color
         const color = this.availableColors.shift();
+        const spawnPoints = this.world.spawns;
 
         // 1. Definim els punts de sortida
-        const spawnPoints = [
+       /* const spawnPoints = [
              { x: 70, y: 500 },
             { x: 120, y: 500 },
             { x: 170, y: 500 },
@@ -45,7 +46,7 @@ class Sala {
             { x: 320, y: 500 },
             { x: 370, y: 350 },
             { x: 420, y: 350 }
-        ];
+        ];*/
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
         //creo el jugador
@@ -61,7 +62,7 @@ class Sala {
                 data: this.getWorldData() // Usamos el método que separamos antes
             }));
         } else {
-            // Opcional: Avisar al cliente que está en modo espera
+            //
             ws.send(JSON.stringify({ type: "WAITING", message: "Esperando jugadores..." }));
         }
 
@@ -136,11 +137,13 @@ class Sala {
         width: this.world.width,
         height: this.world.height,
         obstacles: this.world.obstacles,
-        door: this.world.door
+        door: this.world.door,
+        key: this.world.key
     };
 }
     //estado del juego
     getState() {
+        const holder = this.players.get(this.world.key.holderId);
         return {
             players: Array.from(this.players.values()).map(p => ({
                 id: p.id,
@@ -148,7 +151,13 @@ class Sala {
                 y: p.y,
                 nickname: p.nickname,
                 color: p.color
-            }))
+            })),
+            key: {
+                x: holder ? holder.x : this.world.key.x,
+                y: holder ? holder.y - 20 : this.world.key.y,
+                collected: this.world.key.collected,
+                holderId: this.world.key.holderId
+            }
         };
     }
     //flutter 
@@ -178,6 +187,21 @@ class Sala {
         this.viewers.delete(ws);
         console.log("Observador desconectado");
     }
+    // gestion llave 
+    checkKeyCollision(p) {
+        if (this.world.key.collected) return;
+
+        if (this.isColliding(p, this.world.key)) {
+            this.world.key.collected = true;
+            this.world.key.holderId = p.id;
+
+            console.log(`${p.nickname} ha cogido la llave`);
+
+            this.broadcast("KEY_COLLECTED", {
+                playerId: p.id
+            });
+        }
+    }
 
 
     // ****GAME LOOP
@@ -187,7 +211,7 @@ class Sala {
         // Lógica de inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
-            console.log("¡Partida iniciada! Enviando mundo a todos.");
+            console.log("¡Partida iniciada!");
             //se envia el mundo cuando esten todoss
             const worldData = this.getWorldData();
             this.broadcast("WORLD_INIT", worldData);
@@ -205,7 +229,7 @@ class Sala {
 
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
-            // 1. Colisión con obstáculos
+            // Colisión con obstáculos
             for (const obs of this.world.obstacles) {
                 if (this.isColliding(p, obs)) {
                     p.x = prevX;
@@ -214,15 +238,31 @@ class Sala {
                 }
             }
 
-            // 2. Colisión con puerta impide avanzar P,10
-            if (this.isColliding(p, this.world.door)) {
-                p.x = prevX;
-                p.y = prevY;
-                p.vx = 0; // Cambiado de p.pv a p.vx para detener movimiento
-                
-            }
+            // LLAVE
+            this.checkKeyCollision(p);
 
-            // 3. Colisión con otros jugadores (AHORA ESTÁ DENTRO DEL BUCLE)
+            // si la puerta aún está cerrada
+            if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
+
+                const hasKey = this.world.key.holderId === p.id;
+
+                if (!hasKey) {
+                    p.x = prevX;
+                    p.y = prevY;
+                    p.vx = 0;
+                } else {
+                    this.world.door.opened = true;
+
+                    console.log(`Puerta abierta por ${p.nickname}`);
+
+                    this.broadcast("DOOR_OPENED", {
+                        playerId: p.id
+                    });
+                }
+            }
+            
+
+            // Colisión con otros jugadores (AHORA ESTÁ DENTRO DEL BUCLE)
             for (const other of this.players.values()) {
                 if (p.id === other.id) continue; // No chocamos contra nosotros mismos
 
@@ -230,6 +270,17 @@ class Sala {
                     p.x = prevX;
                     p.y = prevY;
                 }
+            }
+            //  COLISIÓN CON LLAVE
+            if (!this.world.key.collected && this.isColliding(p, this.world.key)) {
+                this.world.key.collected = true;
+                this.world.key.holderId = p.id;
+
+                console.log(`${p.nickname} ha cogido la llave`);
+
+                this.broadcast("KEY_COLLECTED", {
+                    playerId: p.id
+                });
             }
         }
 

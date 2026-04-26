@@ -20,7 +20,8 @@ class Player {
             jump: false
         };
 
-        this.onGround = true; // para salto simple
+        this.onGround = false; // para salto simple
+        this.completedLevel = false; //para pasar a segunda pantalla
     }
 
     // Actualización por tick
@@ -31,34 +32,36 @@ class Player {
         const playerWidth = 40;
         const playerHeight = 40;
 
-        // 1. Movimiento horizontal
+        // Movimiento horizontal
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
         else this.vx = 0;
 
-        // 2. Salto (solo si está en el suelo)
+        //  Salto 
         if (this.input.jump && this.onGround) {
             this.vy = jumpForce; 
             this.onGround = false;
         }
 
-        // 3. Aplicar físicas
+        // Aplicar físicas
         this.vy += gravity;
         this.x += this.vx;
         this.y += this.vy;
 
         // --- LÍMITES DEL MAPA (700x500) ---
-        // Suelo (Y = 0)
-        if (this.y < 0) {
-            this.y = 0;
+
+          const floorY = 500 - playerHeight;
+        //suelo
+        if (this.y >= floorY) {
+            this.y = floorY;
             this.vy = 0;
             this.onGround = true;
         }
-        // Paredes (X)
+
+        // PAREDES
         if (this.x < 0) this.x = 0;
         if (this.x > 700 - playerWidth) this.x = 700 - playerWidth;
 
-        // Guardar si se está moviendo para la animación
         this.isMoving = (this.vx !== 0);
     }
 }
