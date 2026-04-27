@@ -43,7 +43,7 @@ class Sala {
             return { success: false, 
             message: "Error: Configuración de jugador no encontrada" };
         }
-        const spawnPoints = this.world.spawns;
+     
 
         // 1. Definim els punts de sortida
        /* const spawnPoints = [
@@ -172,6 +172,8 @@ class Sala {
                 color: p.color
             })),
             key: {
+                // Si hay portador, la llave sigue al jugador. 
+                // Si no, se queda en su sitio original.
                 x: holder ? holder.x : this.world.key.x,
                 y: holder ? holder.y - 20 : this.world.key.y,
                 collected: this.world.key.collected,
@@ -206,7 +208,7 @@ class Sala {
         this.viewers.delete(ws);
         console.log("Observador desconectado");
     }
-    // gestion llave 
+    // gestion llave quien la tiene 
     checkKeyCollision(p) {
         if (this.world.key.collected) return;
 
@@ -262,13 +264,14 @@ class Sala {
             if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
 
                 const hasKey = this.world.key.holderId === p.id;
-
+                
                 if (!hasKey) {
-                    //si no tiene llave el jugador rebota contra la puerta
+                    //10 si no tiene llave el jugador rebota contra la puerta
                     p.x = prevX;
                     p.y = prevY;
                     p.vx = 0;
                 } else {
+                    //aqui controlo si el jugador que tiene la llave puede abrirla
                     this.world.door.opened = true;
 
                     console.log(`Puerta abierta por ${p.nickname}`);
