@@ -1,33 +1,28 @@
 class Player {
     ///tambien tiene que tener un color 
-    constructor(id, nickname, ws, config) {
-        // Identificació
+    constructor(id, nickname, ws, config, spawnX, spawnY, color) {
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
-        // Posició (On està al món)
-        const floorY = 500 - 40; // 40 es el playerHeight
-        this.y = config.x;
-        this.x = config.y;
-        this.width = config.width || 40; // Valor por defecto si no existe
+
+        // POSICIÓN: Viene de los cálculos de tu Sala
+        this.x = spawnX;
+        this.y = spawnY;
+
+        // TAMAÑO: Viene del JSON
+        this.width = config.width || 40;
         this.height = config.height || 40;
  
-
-        // velocidad
-        this.vx = 0; // Velocitat horitzontal
-        this.vy = 0; // Velocitat vertical (gravetat)
-        this.color = null;
-
+        // PROPIEDADES
+        this.vx = 0;
+        this.vy = 0;
+        this.color = color;
       
-        this.input = {
-            left: false,
-            right: false,
-            jump: false
-        };
-
-        this.onGround = false; // para salto simple
-        this.completedLevel = false; //para pasar a segunda pantalla
+        this.input = { left: false, right: false, jump: false };
+        this.onGround = false;
+        this.completedLevel = false;
     }
+
     setColor(color) {
         this.color = color;
     }
