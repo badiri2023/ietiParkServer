@@ -7,7 +7,7 @@ class Player {
         this.ws = ws;
         // Posició (On està al món)
         this.x = startX - playerWidth / 2;
-        this.y = startY - playerWidth / 2;
+        this.y = startY - playerHeight / 2;
         const playerWidth = 40;
         const playerHeight = 40;
 
