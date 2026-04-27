@@ -5,8 +5,8 @@ class World {
         this.sprites = level.sprites;
         this.layers = level.layers;
 
-        this.width = level.viewportWidth || 700; 
-        this.height = level.viewportHeight || 500;
+        this.width = level.viewportWidth *3; 
+        this.height = level.viewportHeight *2;
 
         // PUERTA
         const doorSprite = level.sprites.find(s => s.type === "door");
