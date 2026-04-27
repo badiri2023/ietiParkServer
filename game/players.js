@@ -1,6 +1,6 @@
 class Player {
     ///tambien tiene que tener un color 
-    constructor(id, nickname, ws, spawnX, spawnY, color, worldWidth, worldHeight) {
+    constructor(id, nickname, ws, spawnX, spawnY, color) {
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
@@ -20,8 +20,7 @@ class Player {
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
         this.completedLevel = false;
-        this.world.width;  
-        this.world.height;
+
         
     }
  

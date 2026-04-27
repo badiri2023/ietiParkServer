@@ -31,6 +31,8 @@ class World {
         this.obstacles = [];
         //key 13 gestiono estado key
         const keySprite = level.sprites.find(s => s.type === "key");
+        // En World.js
+        console.log("Spawn encontrado:", level.sprites.find(s => s.type === "player1"));
         
         this.key = {
             x: keySprite ? keySprite.x : 200,
