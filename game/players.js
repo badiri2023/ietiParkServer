@@ -20,10 +20,11 @@ class Player {
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
         this.completedLevel = false;
+        this.world.width,  
+        this.world.height
         
     }
-    this.world.width,  // <--- Pasamos el ancho real del mundo
-    this.world.height
+ 
 
     setColor(color) {
         this.color = color;
