@@ -1,20 +1,23 @@
 class Player {
     ///tambien tiene que tener un color 
-    constructor(id, nickname, ws, startX, startY, color) {
+    constructor(id, nickname, ws, config) {
         // Identificació
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
         // Posició (On està al món)
         const floorY = 500 - 40; // 40 es el playerHeight
-        this.y = (startY !== undefined && startY > 0) ? startY : floorY;
-        this.x = startX;
+        this.y = config.x;
+        this.x = config.y;
+        this.width = config.width || 40; // Valor por defecto si no existe
+        this.height = config.height || 40;
  
 
         // velocidad
         this.vx = 0; // Velocitat horitzontal
         this.vy = 0; // Velocitat vertical (gravetat)
-        this.color = color;
+        this.color = null;
+
       
         this.input = {
             left: false,
@@ -25,15 +28,16 @@ class Player {
         this.onGround = false; // para salto simple
         this.completedLevel = false; //para pasar a segunda pantalla
     }
+    setColor(color) {
+        this.color = color;
+    }
 
     // Actualización por tick
-    update() {
+    update(floorLimit, mapWidth) {
         const speed = 5;
         const gravity = 0.8;  
         const jumpForce = -15;  
-        const playerWidth = 40;
-        const playerHeight = 40;
-
+       
         // Movimiento horizontal
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
@@ -52,7 +56,7 @@ class Player {
 
         // --- LÍMITES DEL MAPA (700x500) ---
 
-          const floorY = 500 - playerHeight;
+        const floorY = floorLimit - this.height;
         //suelo
         if (this.y >= floorY) {
             this.y = floorY;
@@ -62,7 +66,7 @@ class Player {
 
         // PAREDES
         if (this.x < 0) this.x = 0;
-        if (this.x > 700 - playerWidth) this.x = 700 - playerWidth;
+        if (this.x > mapWidth - this.width) this.x = mapWidth - this.width;
 
         this.isMoving = (this.vx !== 0);
     }
