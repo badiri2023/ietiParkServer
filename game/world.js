@@ -4,8 +4,8 @@ class World {
         const level = levelData.levels[0];
 
         // Tamaño (puedes ajustar esto luego)
-        this.width = 700;
-        this.height = 500;
+        this.width = level.viewportWidth;
+        this.height = level.viewportHeight;
 
         // PUERTA
         const doorSprite = level.sprites.find(s => s.type === "door");
@@ -29,11 +29,13 @@ class World {
         //  OBSTÁCULOS (por ahora vacío)
         this.obstacles = [];
         //key
+        const keySprite = level.sprites.find(s => s.type === "key");
+        
         this.key = {
-            x: 200,
-            y: 300,
-            width: 30,
-            height: 30,
+            x: keySprite ? keySprite.x : 200,
+            y:  keySprite ? keySprite.y : 300,
+            width: keySprite.width,
+            height:keySprite.heigh,
             collected: false,
             holderId: null
         };
