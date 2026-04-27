@@ -1,65 +1,50 @@
 class Player {
-    ///tambien tiene que tener un color 
-    constructor(id, nickname, ws, config, spawnX, spawnY, color) {
+    constructor(id, nickname, ws, spawnX, spawnY, color) {
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
 
-        // POSICIÓN: Viene de los cálculos de tu Sala
         this.x = spawnX;
         this.y = spawnY;
 
-        // TAMAÑO: Viene del JSON
-        this.width = config.width || 40;
-        this.height = config.height || 40;
- 
-        // PROPIEDADES
+        this.width = 40;
+        this.height = 40;
+
         this.vx = 0;
         this.vy = 0;
         this.color = color;
-      
+
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
         this.completedLevel = false;
     }
 
-    setColor(color) {
-        this.color = color;
-    }
-
-    // Actualización por tick
     update(floorLimit, mapWidth) {
         const speed = 5;
-        const gravity = 0.8;  
-        const jumpForce = -15;  
-       
-        // Movimiento horizontal
+        const gravity = 0.8;
+        const jumpForce = -15;
+
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
         else this.vx = 0;
 
-        //  Salto 
         if (this.input.jump && this.onGround) {
-            this.vy = jumpForce; 
+            this.vy = jumpForce;
             this.onGround = false;
         }
 
-        // Aplicar físicas
         this.vy += gravity;
         this.x += this.vx;
         this.y += this.vy;
 
-        // --- LÍMITES DEL MAPA (700x500) ---
-
         const floorY = floorLimit - this.height;
-        //suelo
+
         if (this.y >= floorY) {
             this.y = floorY;
             this.vy = 0;
             this.onGround = true;
         }
 
-        // PAREDES
         if (this.x < 0) this.x = 0;
         if (this.x > mapWidth - this.width) this.x = mapWidth - this.width;
 
@@ -67,4 +52,4 @@ class Player {
     }
 }
 
-module.exports = Player
+module.exports = Player;
