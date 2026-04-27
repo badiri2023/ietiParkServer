@@ -46,7 +46,6 @@ wss.on('connection', (ws) => {
             return;
         }
 
-
         // Player JOIN
       
         if (msg.type === "JOIN") {
