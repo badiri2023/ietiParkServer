@@ -28,25 +28,18 @@ class World {
 
         //  OBSTÁCULOS (por ahora vacío)
         this.obstacles = [];
-        //key
-        //const keySprite = level.sprites.find(s => s.type === "key");
+        //key 13 gestiono estado key
+        const keySprite = level.sprites.find(s => s.type === "key");
         
-        /*this.key = {
+        this.key = {
             x: keySprite ? keySprite.x : 200,
             y:  keySprite ? keySprite.y : 300,
             width: keySprite.width,
             height:keySprite.heigh,
             collected: false,
             holderId: null
-        };*/
-        this.key = {
-            x:  200,
-            y:  300,
-            width: 30,
-            height:30,
-            collected: false,
-            holderId: null
         };
+     
     }
 }
 

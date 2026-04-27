@@ -71,6 +71,21 @@
           "flipY": false,
           "depth": 0.0,
           "groupId": "__main__"
+        },
+        {
+          "name": "key",
+          "gameplayData": "",
+          "type": "key",
+          "animationId": "anim_1777305199392731",
+          "x": 387,
+          "y": 302,
+          "width": 32,
+          "height": 32,
+          "imageFile": "media/skeleton_key.png",
+          "flipX": false,
+          "flipY": false,
+          "depth": 0.0,
+          "groupId": "__main__"
         }
       ],
       "spriteGroups": [
