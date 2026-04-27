@@ -2,6 +2,7 @@ const levelData = require('./game_data.json');
 class World {
     constructor() {
         const level = levelData.levels[0];
+        this.sprites = level.sprites;
 
         // Tamaño (puedes ajustar esto luego)
         this.width = level.viewportWidth;
