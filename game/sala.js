@@ -94,7 +94,7 @@ class Sala {
         const player = this.players.get(id);
         if (player) {
             // RECICLAJE: Devolvemos el color al banco
-            console.log(`${player.nickname} se ha  desconectado`);
+            //console.log(`${player.nickname} se ha  desconectado`);
             this.availableColors.push(player.color);
             this.players.delete(id);
         }

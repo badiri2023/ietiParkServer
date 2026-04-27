@@ -37,7 +37,7 @@ class World {
             x: keySprite ? keySprite.x : 200,
             y:  keySprite ? keySprite.y : 300,
             width: keySprite.width,
-            height:keySprite.heigh,
+            height:keySprite.height,
             collected: false,
             holderId: null
         };
