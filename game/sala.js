@@ -180,7 +180,10 @@ class Sala {
                 y: holder ? holder.y - 20 : this.world.key.y,
                 collected: this.world.key.collected,
                 holderId: this.world.key.holderId
-            }
+            },
+            door: {
+            opened: this.world.door.opened
+        }
         };
     }
     //flutter 
@@ -305,7 +308,7 @@ class Sala {
                 }
             }
         }
-
+        console.log("DEBUG SERVER:", JSON.stringify(state));
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     
