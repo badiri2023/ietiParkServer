@@ -13,6 +13,8 @@ class Sala {
         this.world = new World();
         this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
+        this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
+        this.levelCompleted = false;
         this.availableColors = [...COLORS];
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
@@ -42,7 +44,7 @@ class Sala {
         if (!playerConfig) {
             return { success: false, 
             message: "Error: Configuración de jugador no encontrada" };
-        }
+        }//probar si el jugador recibe bien la configuracion
      
 
         // 1. Definim els punts de sortida
@@ -156,6 +158,7 @@ class Sala {
         width: this.world.width,
         height: this.world.height,
         obstacles: this.world.obstacles,
+        layers : this.world.layers,
         door: this.world.door,
         key: this.world.key
     };
@@ -288,8 +291,18 @@ class Sala {
                 if (p.id === other.id) continue; // No chocamos contra nosotros mismos
 
                 if (this.isPlayerColliding(p, other)) {
-                    p.x = prevX;
-                    p.y = prevY;
+                    // Lógica de apilamiento:
+                    // 1. ¿El jugador se está moviendo hacia abajo (cayendo)?
+                    // 2. ¿Su pie está por encima de la mitad del otro jugador?
+                    if (p.vy > 0 && p.y + p.height < other.y + other.height / 2) {
+                        // "Aterrizamos" al jugador encima del otro
+                        p.y = other.y - p.height;
+                        p.vy = 0;
+                        p.onGround = true; // Permite saltar desde la cabeza de otro
+                    } else {
+                        // Colisión lateral normal (el jugador rebota/se bloquea)
+                        p.x = prevX; 
+    }
                 }
             }
         }
