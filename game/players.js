@@ -6,8 +6,10 @@ class Player {
         this.nickname = nickname;
         this.ws = ws;
         // Posició (On està al món)
+        const floorY = 500 - 40; // 40 es el playerHeight
+        this.y = (startY !== undefined && startY > 0) ? startY : floorY;
         this.x = startX;
-        this.y = startY;
+ 
 
         // velocidad
         this.vx = 0; // Velocitat horitzontal
