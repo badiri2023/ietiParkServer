@@ -3,6 +3,7 @@ class World {
     constructor() {
         const level = levelData.levels[0];
         this.sprites = level.sprites;
+        this.layers = level.layers;
 
         // Tamaño (puedes ajustar esto luego)
         this.width = level.viewportWidth;
