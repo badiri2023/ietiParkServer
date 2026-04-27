@@ -147,7 +147,7 @@
     {
       "name": "skeleton_key",
       "fileName": "media/skeleton_key.png",
-      "mediaType": "tileset",
+      "mediaType": "spritesheet",
       "tileWidth": 32,
       "tileHeight": 32,
       "selectionColorHex": "#FFCC00",
