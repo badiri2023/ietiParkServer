@@ -310,7 +310,7 @@ class Sala {
             }
         }
         const state = this.getState();
-        console.log("DEBUG SERVER:", JSON.stringify(state));
+        //console.log("DEBUG SERVER:", JSON.stringify(state));
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     
