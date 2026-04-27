@@ -1,4 +1,4 @@
-const levelData = require('./level.json');
+const levelData = require('./game_data.json');
 class World {
     constructor() {
         const level = levelData.levels[0];
