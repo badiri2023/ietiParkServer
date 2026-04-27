@@ -22,6 +22,8 @@ class Player {
         this.completedLevel = false;
         
     }
+    this.world.width,  // <--- Pasamos el ancho real del mundo
+    this.world.height
 
     setColor(color) {
         this.color = color;
