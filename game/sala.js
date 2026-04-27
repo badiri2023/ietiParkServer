@@ -70,7 +70,9 @@ class Sala {
             ws, 
             spawn.x, 
             spawn.y, 
-            color
+            color,
+            this.world.width,  // <--- Enviamos el número (ej: 700)
+            this.world.height
         );
         this.players.set(id, player);
         console.log(`${nickname} tiene asignado el color ${color}`);
@@ -154,15 +156,15 @@ class Sala {
     }
     // mundo actualizado 
     getWorldData() {
-    return {
-        width: this.world.width,
-        height: this.world.height,
-        obstacles: this.world.obstacles,
-        layers : this.world.layers,
-        door: this.world.door,
-        key: this.world.key
-    };
-}
+        return {
+            width: this.world.width,
+            height: this.world.height,
+            obstacles: this.world.obstacles,
+            layers : this.world.layers,
+            door: this.world.door,
+            key: this.world.key
+        };
+    }
     //estado del juego
     getState() {
         const holder = this.players.get(this.world.key.holderId);

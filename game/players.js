@@ -1,6 +1,6 @@
 class Player {
     ///tambien tiene que tener un color 
-    constructor(id, nickname, ws, spawnX, spawnY, color) {
+    constructor(id, nickname, ws, spawnX, spawnY, color, worldWidth, worldHeight) {
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
