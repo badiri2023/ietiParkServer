@@ -6,8 +6,10 @@ class Player {
         this.nickname = nickname;
         this.ws = ws;
         // Posició (On està al món)
-        this.x = startX;
-        this.y = startY;
+        this.x = startX - playerWidth / 2;
+        this.y = startY - playerWidth / 2;
+        const playerWidth = 40;
+        const playerHeight = 40;
 
         // velocidad
         this.vx = 0; // Velocitat horitzontal
@@ -20,17 +22,16 @@ class Player {
             jump: false
         };
 
-        this.onGround = false; // para salto simple
+        this.onGround = true; // para salto simple
         this.completedLevel = false; //para pasar a segunda pantalla
     }
 
     // Actualización por tick
     update() {
         const speed = 5;
-        const gravity = -0.8;  // Negativo para que tire hacia abajo la gravedad
-        const jumpForce = 15;  // Positivo para que salte hacia arriba el pj
-        const playerWidth = 40;
-        const playerHeight = 40;
+        const gravity = 0.8;  
+        const jumpForce = -15;  // Positivo para que salte hacia arriba el pj
+        
 
         // Movimiento horizontal
         if (this.input.left) this.vx = -speed;
@@ -50,12 +51,13 @@ class Player {
 
         // --- LÍMITES DEL MAPA (700x500) ---
 
-          const floorY = 500 - playerHeight;
-        //suelo
-        if (this.y >= floorY) {
-            this.y = floorY;
-            this.vy = 0;
-            this.onGround = true;
+          const floorY = this.world.height - playerHeight;
+
+        // SUELO REAL DEL MUNDO
+        if (p.y >= floorY) {
+            p.y = floorY;
+            p.vy = 0;
+            p.onGround = true;
         }
 
         // PAREDES
