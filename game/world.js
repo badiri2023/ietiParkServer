@@ -29,7 +29,7 @@ class World {
         //  OBSTÁCULOS (por ahora vacío)
         this.obstacles = [];
         //key
-        const keySprite = level.sprites.find(s => s.type === "key");
+        //const keySprite = level.sprites.find(s => s.type === "key");
         
         /*this.key = {
             x: keySprite ? keySprite.x : 200,
@@ -39,6 +39,14 @@ class World {
             collected: false,
             holderId: null
         };*/
+        this.key = {
+            x:  200,
+            y:  300,
+            width: 30,
+            height:30,
+            collected: false,
+            holderId: null
+        };
     }
 }
 

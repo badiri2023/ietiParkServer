@@ -28,13 +28,22 @@ class Sala {
         }
         
         if (this.players.size >= this.maxPlayers) {
-            return { success: false, message: "Sala plena" };
+            return { success: false, message: "Sala llena" };
         }
         if (this.availableColors.length === 0) 
             return { success: false, message: "No hay colores disponibles" };
+        
+        
         //asigno color
         const color = this.availableColors.shift();
-        const spawnPoints = this.world.spawns;
+
+        //config del json game_data.json
+        const playerConfig = this.world.sprites.find(s => s.type === "player1");
+        if (!playerConfig) {
+            return { success: false, 
+            message: "Error: Configuración de jugador no encontrada" };
+        }
+     
 
         // 1. Definim els punts de sortida
        /* const spawnPoints = [
@@ -48,9 +57,19 @@ class Sala {
             { x: 420, y: 350 }
         ];*/
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
+        const spawnPoints = this.world.spawns;
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
+        
         //creo el jugador
-        const player = new Player(id, nickname, ws, spawn.x, spawn.y, color);
+        const player = new Player(
+            id, 
+            nickname, 
+            ws, 
+            playerConfig,
+            spawn.x, 
+            spawn.y, 
+            color
+        );
         this.players.set(id, player);
         console.log(`${nickname} tiene asignado el color ${color}`);
 
@@ -67,7 +86,7 @@ class Sala {
         }
 
         return { success: true, player };
-        }
+    }
 
     removePlayer(id) {
         const player = this.players.get(id);
@@ -153,6 +172,8 @@ class Sala {
                 color: p.color
             })),
             key: {
+                // Si hay portador, la llave sigue al jugador. 
+                // Si no, se queda en su sitio original.
                 x: holder ? holder.x : this.world.key.x,
                 y: holder ? holder.y - 20 : this.world.key.y,
                 collected: this.world.key.collected,
@@ -187,7 +208,7 @@ class Sala {
         this.viewers.delete(ws);
         console.log("Observador desconectado");
     }
-    // gestion llave 
+    // gestion llave quien la tiene 
     checkKeyCollision(p) {
         if (this.world.key.collected) return;
 
@@ -243,12 +264,14 @@ class Sala {
             if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
 
                 const hasKey = this.world.key.holderId === p.id;
-
+                
                 if (!hasKey) {
+                    //10 si no tiene llave el jugador rebota contra la puerta
                     p.x = prevX;
                     p.y = prevY;
                     p.vx = 0;
                 } else {
+                    //aqui controlo si el jugador que tiene la llave puede abrirla
                     this.world.door.opened = true;
 
                     console.log(`Puerta abierta por ${p.nickname}`);
