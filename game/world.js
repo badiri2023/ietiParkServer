@@ -9,7 +9,7 @@ class World {
 
         // PUERTA
         const doorSprite = level.sprites.find(s => s.type === "door");
-        const keySprite = level.sprites.find(s =>type ==="key")
+        const keySprite = level.sprites.find(s =>type ==="skeleton_key")
 
         this.door = {
             x: doorSprite.x,
