@@ -28,12 +28,21 @@ class Sala {
         }
         
         if (this.players.size >= this.maxPlayers) {
-            return { success: false, message: "Sala plena" };
+            return { success: false, message: "Sala llena" };
         }
         if (this.availableColors.length === 0) 
             return { success: false, message: "No hay colores disponibles" };
+        
+        
         //asigno color
         const color = this.availableColors.shift();
+
+        //config del json game_data.json
+        const playerConfig = this.world.sprites.find(s => s.type === "player1");
+        if (!playerConfig) {
+            return { success: false, 
+            message: "Error: Configuración de jugador no encontrada" };
+        }
         const spawnPoints = this.world.spawns;
 
         // 1. Definim els punts de sortida
@@ -48,9 +57,19 @@ class Sala {
             { x: 420, y: 350 }
         ];*/
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
+        const spawnPoints = this.world.spawns;
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
+        
         //creo el jugador
-        const player = new Player(id, nickname, ws, spawn.x, spawn.y, color);
+        const player = new Player(
+            id, 
+            nickname, 
+            ws, 
+            playerConfig,
+            spawn.x, 
+            spawn.y, 
+            color
+        );
         this.players.set(id, player);
         console.log(`${nickname} tiene asignado el color ${color}`);
 
@@ -67,7 +86,7 @@ class Sala {
         }
 
         return { success: true, player };
-        }
+    }
 
     removePlayer(id) {
         const player = this.players.get(id);
@@ -245,6 +264,7 @@ class Sala {
                 const hasKey = this.world.key.holderId === p.id;
 
                 if (!hasKey) {
+                    //si no tiene llave el jugador rebota contra la puerta
                     p.x = prevX;
                     p.y = prevY;
                     p.vx = 0;
