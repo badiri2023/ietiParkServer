@@ -24,6 +24,7 @@ class Sala {
     //******* JUGADORES********
    
     addPlayer(id, nickname, ws) {
+        
         const nameTaken = Array.from(this.players.values()).some(p => p.nickname === nickname);
         if (nameTaken) {
             return { success: false, message: "El nickname ya existe" };
