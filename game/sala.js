@@ -67,7 +67,6 @@ class Sala {
             id, 
             nickname, 
             ws, 
-            playerConfig,
             spawn.x, 
             spawn.y, 
             color
