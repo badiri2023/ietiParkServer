@@ -14,11 +14,11 @@ class World {
         //this.width = Math.max(...level.sprites.map(s => s.x + s.width));
         //this.height = Math.max(...level.sprites.map(s => s.y + s.height));
         this.width=800;
-        this.height=500;
+        this.height=400;
 
         this.door = {
             x: doorSprite.x,
-            y: 0,
+            y: doorSprite.y,
             width: doorSprite.width,
             height: doorSprite.height,
             opened :false
@@ -34,6 +34,9 @@ class World {
 
         //  OBSTÁCULOS (por ahora vacío)
         this.obstacles = [];
+        console.log("Mundo iniciado con éxito:");
+        console.log("- Puerta en:", this.door.x, this.door.y);
+        console.log("- Spawn en:", this.spawns[0]);
         //key 13 gestiono estado key
         const keySprite = level.sprites.find(s => s.type === "key");
         // En World.js
