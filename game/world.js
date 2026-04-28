@@ -16,7 +16,7 @@ class World {
 
         this.door = {
             x: doorSprite.x,
-            y: 200- doorSprite.y,
+            y: 80- doorSprite.y,
             width: doorSprite.width,
             height: doorSprite.height,
             opened :false
