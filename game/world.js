@@ -5,15 +5,18 @@ class World {
         this.sprites = level.sprites;
         this.layers = level.layers;
 
-        this.width = level.viewportWidth ; 
-        this.height = level.viewportHeight ;
-
+        
+        console.log("LEVEL:", level);
+        console.log("SPRITES:", level.sprites);
+        console.log("WORLD SIZE:", this.width, this.height);
         // PUERTA
         const doorSprite = level.sprites.find(s => s.type === "door");
+        this.width = Math.max(...level.sprites.map(s => s.x + s.width));
+        this.height = Math.max(...level.sprites.map(s => s.y + s.height));
 
         this.door = {
             x: doorSprite.x,
-            y: doorSprite.y,
+            y: 200- doorSprite.y,
             width: doorSprite.width,
             height: doorSprite.height,
             opened :false
