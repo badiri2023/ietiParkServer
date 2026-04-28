@@ -184,6 +184,8 @@ class Sala {
                 holderId: this.world.key.holderId
                         },
             door: {
+                x: this.world.door.x,
+                y: this.world.door.y,
             opened: this.world.door.opened
         }
         };
@@ -312,6 +314,10 @@ class Sala {
         }
         const state = this.getState();
         //console.log("DEBUG SERVER:", JSON.stringify(state));
+        console.log("WORLD:", this.width, this.height);
+        console.log("PLAYER:", this.y, this.x);
+        console.log("FLOOR:", this.worldHeight - this.height);
+        console.log("DOOR:", this.door.y);
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     
