@@ -247,6 +247,8 @@ class Sala {
 
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
+        //array jugadores para este frame
+        const playersList = Array.from(this.players.values());
  
         for (const p of this.players.values()) {
             const prevX = p.x;
@@ -319,15 +321,13 @@ class Sala {
                 }
             }
         }
-        const allFinished = Array.from(this.players.values()).every(p => p.finished);
+        const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
 
-            if (allFinished && !this.levelCompleted) {
-                this.levelCompleted = true;
-
-                console.log("Nivel completado");
-
-                this.broadcast("LEVEL_COMPLETED", {});
-            }
+        if (allFinished && !this.levelCompleted) {
+            this.levelCompleted = true;
+            console.log("Nivel completado con éxito");
+            this.broadcast("LEVEL_COMPLETED", {});
+        }
         const state = this.getState();
         //console.log("DEBUG SERVER:", JSON.stringify(state));
         //console.log("WORLD:", this.world.width, this.world.height);
