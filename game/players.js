@@ -50,12 +50,11 @@ class Player {
 
         // Aplicar físicas
         this.vy += gravity;
+
         this.x += this.vx;
         this.y += this.vy;
 
-        // --- LÍMITES DEL MAPA (700x500) ---
-
-        const floorY = this.worldHeight - this.height;
+        const floorY = 0;
         //suelo
         if (this.y >= floorY) {
             this.y = floorY;
@@ -69,7 +68,7 @@ class Player {
             this.x = this.worldWidth - this.width;
         }
 
-        this.isMoving = (this.vx !== 0);
+        //this.isMoving = (this.vx !== 0);
         }
 }
 
