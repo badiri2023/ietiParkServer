@@ -1,0 +1,44 @@
+version: '3.1'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: pico4
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo-data:/data/db
+
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: m0486-tema4-ra5-mongo-express
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: "mongodb://root:password@m0486-tema4-ra5-mongo:27017/"
+
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+
+volumes:
+  mongo-data:
+  
