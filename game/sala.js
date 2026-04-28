@@ -95,12 +95,37 @@ class Sala {
 
     removePlayer(id) {
         const player = this.players.get(id);
-        if (player) {
+        if (!player) return;
+        const nickname = player.nickname;
+
+        /*if (player) {
             // RECICLAJE: Devolvemos el color al banco
             //console.log(`${player.nickname} se ha  desconectado`);
             this.availableColors.push(player.color);
             this.players.delete(id);
+        }*/
+       if (this.world.key.holderId === id) {
+            this.world.key.holderId = null;
+            this.world.key.collected = false;
+
+            this.broadcast("KEY_RESET", {
+                reason: "PLAYER_LEFT"
+            });
         }
+
+        // eliminar jugador
+        this.availableColors.push(player.color);
+        this.players.delete(id);
+
+        // eventos del juego
+        this.broadcast("PLAYER_LEFT", {
+            id,
+            nickname
+        });
+
+        this.broadcast("PLAYER_LIST", this.getPlayerList());
+
+        console.log(`Jugador ${nickname} desconectado`);
     }
 
     getPlayer(id) {
