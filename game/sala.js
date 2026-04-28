@@ -64,7 +64,8 @@ class Sala {
         const spawn = spawnPoints[this.players.size % spawnPoints.length];
         
         //creo el jugador
-        const player = new Player(
+        const player = new Player(id, nickname, ws, spawnX, spawnY, color, this.world);
+        /*const player = new Player(
             id, 
             nickname, 
             ws, 
@@ -72,12 +73,12 @@ class Sala {
             spawn.y, 
             color,
         
-        );
+        );*/
         this.players.set(id, player);
         player.worldWidth = this.world.width;
         player.worldHeight = this.world.height;
         console.log(`${nickname} tiene asignado el color ${color}`);
-
+        console.log(`${player.worldHeight} `);
 
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
@@ -314,10 +315,10 @@ class Sala {
         }
         const state = this.getState();
         //console.log("DEBUG SERVER:", JSON.stringify(state));
-        console.log("WORLD:", this.width, this.height);
-        console.log("PLAYER:", this.y, this.x);
-        console.log("FLOOR:", this.worldHeight - this.height);
-        console.log("DOOR:", this.door.y);
+        console.log("WORLD FROM SALA:", this.world.width, this.world.height);
+        console.log("PLAYER WORLD:", this.worldWidth, this.worldHeight);
+        //console.log("FLOOR:", this.worldHeight - this.height);
+        console.log("DOOR:", this.world.door.y);
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     
