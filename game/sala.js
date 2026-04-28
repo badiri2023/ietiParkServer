@@ -34,18 +34,13 @@ class Sala {
             return { success: false, message: "Sala llena" };
         }
         if (this.availableColors.length === 0) 
-            return { success: false, message: "No hay colores disponibles" };
-        
+            return { success: false, message: "No hay colores disponibles" };        
         
         //asigno color
         const color = this.availableColors.shift();
+        const spawn = this.world.spawns[this.players.size % this.world.spawns.length];
 
-        //config del json game_data.json
-        const playerConfig = this.world.sprites.find(s => s.type === "player1");
-        if (!playerConfig) {
-            return { success: false, 
-            message: "Error: Configuración de jugador no encontrada" };
-        }//probar si el jugador recibe bien la configuracion
+        
      
 
         // 1. Definim els punts de sortida
@@ -58,28 +53,32 @@ class Sala {
             { x: 320, y: 500 },
             { x: 370, y: 350 },
             { x: 420, y: 350 }
-        ];*/
+        ];*//*//config del json game_data.json
+        const playerConfig = this.world.sprites.find(s => s.type === "player1");
+        if (!playerConfig) {
+            return { success: false, 
+            message: "Error: Configuración de jugador no encontrada" };
+        }//probar si el jugador recibe bien la configuracion */
         //Calculem on ha d'aparèixer segons quants jugadors hi ha
-        const spawnPoints = this.world.spawns;
-        const spawn = spawnPoints[this.players.size % spawnPoints.length];
+        //const spawnPoints = this.world.spawns;
+        //const spawn = spawnPoints[this.players.size % spawnPoints.length];
+        
         
         //creo el jugador
-        const player = new Player(id, nickname, ws, spawnX, spawnY, color, this.world);
-        /*const player = new Player(
+        const player = new Player(
             id, 
             nickname, 
             ws, 
             spawn.x, 
             spawn.y, 
             color,
+            this.world
         
-        );*/
+        );
         this.players.set(id, player);
-        player.worldWidth = this.world.width;
-        player.worldHeight = this.world.height;
+    
         console.log(`${nickname} tiene asignado el color ${color}`);
-        console.log(`${player.worldHeight} `);
-
+        console.log(`WORLD: ${this.world.width}x${this.world.height}`);
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
             ws.send(JSON.stringify({
@@ -148,7 +147,7 @@ class Sala {
     isPlayerColliding(a, b) {
 
         return (
-            a.x < b.x + size &&
+            a.x < b.x + b.width &&
             a.x + a.width > b.x &&
             a.y < b.y + b.height &&
             a.y + a.height > b.y
@@ -315,9 +314,7 @@ class Sala {
         }
         const state = this.getState();
         //console.log("DEBUG SERVER:", JSON.stringify(state));
-        console.log("WORLD FROM SALA:", this.world.width, this.world.height);
-        console.log("PLAYER WORLD:", this.worldWidth, this.worldHeight);
-        //console.log("FLOOR:", this.worldHeight - this.height);
+        console.log("WORLD:", this.world.width, this.world.height);
         console.log("DOOR:", this.world.door.y);
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
