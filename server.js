@@ -39,6 +39,8 @@ async function connectMongo() {
 
 
 let partidaActual = null;//estado partida
+
+
 /////-------Websocket server
 wss.on('connection', (ws) => {
     console.log("Cliente conectado ");
@@ -143,6 +145,24 @@ wss.on('connection', (ws) => {
             player.input.right = msg.right;
             player.input.jump = msg.jump;
             //console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
+             if (partidaActual) {
+                await Partides.updateOne(
+                    { _id: partidaActual._id },
+                    {
+                        $push: {
+                            actions: {
+                                playerId: myId,
+                                input: {
+                                    left: msg.left,
+                                    right: msg.right,
+                                    jump: msg.jump
+                                },
+                                timestamp: new Date()
+                            }
+                        }
+                    }
+                );
+            }
         }
     });
     //*******desconexión
@@ -152,6 +172,9 @@ wss.on('connection', (ws) => {
             return;
         }
         if (myId) {
+        sala.handlePlayerDisconnect(myId);
+        }
+       /* if (myId) {
             const player = sala.getPlayer(myId);
             const nickName = player ? player.nickname : "Desconocido";
             sala.removePlayer(myId);
@@ -162,10 +185,14 @@ wss.on('connection', (ws) => {
 
             sala.broadcast("PLAYER_LIST", sala.getPlayerList());
 
-            console.log(`Jugador ${nickName} desconectado`);
-        }
+            console.log(`Jugador ${nickName} desconectado`);*/
     });
      ws.on('error', (err) => {
         console.log("Error en conexión:", err.message);
     });
 });
+
+async function start() {
+    await connectMongo();
+}
+start();

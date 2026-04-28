@@ -19,7 +19,6 @@ class Player {
         this.finished = false;
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
-        //this.completedLevel = false;
         this.worldWidth = world.width;  // Ajusta según tu mapa
         this.worldHeight = world.height;
         
