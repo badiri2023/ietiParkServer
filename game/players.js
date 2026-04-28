@@ -54,7 +54,7 @@ class Player {
         this.x += this.vx;
         this.y += this.vy;
 
-        const floorY = 0;
+        const floorY = this.worldHeight - this.height;
         //suelo
         if (this.y >= floorY) {
             this.y = floorY;
