@@ -79,6 +79,10 @@ wss.on('connection', (ws) => {
                 }));
                 return;
             }
+            if (!Jugadors) {
+                    console.log("Mongo no listo aún");
+                    return;
+                }
 
             await Jugadors.updateOne(
                 {_id: myId},
