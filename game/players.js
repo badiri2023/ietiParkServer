@@ -33,42 +33,46 @@ class Player {
     // Actualización por tick
     update() {
         //SERVER: Implementació dels salts i col·lisions entre usuaris (“s’apilen” un sobre l’altre) 
-        const speed = 5;
-        const gravity = 0.8;  
-        const jumpForce = -15;  
-       
-        // Movimiento horizontal
+       const speed = 5;
+
+        // ✔ gravedad coherente con canvas (Y hacia abajo)
+        const gravity = 0.8;
+
+        // ✔ salto negativo (sube)
+        const jumpForce = -15;
+
+        // --- MOVIMIENTO HORIZONTAL ---
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
         else this.vx = 0;
 
-        //  Salto 
+        // --- SALTO ---
         if (this.input.jump && this.onGround) {
-            this.vy = jumpForce; 
+            this.vy = jumpForce;
             this.onGround = false;
         }
 
-        // Aplicar físicas
+        // --- FÍSICA ---
         this.vy += gravity;
 
         this.x += this.vx;
         this.y += this.vy;
 
+        // --- SUELO CORRECTO ---
         const floorY = this.worldHeight - this.height;
-        //suelo
+
         if (this.y >= floorY) {
             this.y = floorY;
             this.vy = 0;
             this.onGround = true;
         }
 
-        // PAREDES
+        // --- PAREDES ---
         if (this.x < 0) this.x = 0;
+
         if (this.x > this.worldWidth - this.width) {
             this.x = this.worldWidth - this.width;
         }
-
-        //this.isMoving = (this.vx !== 0);
         }
 }
 
