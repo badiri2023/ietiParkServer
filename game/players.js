@@ -9,8 +9,8 @@ class Player {
         this.x = spawnX;
         this.y = spawnY;
 
-        this.width = 40;
-        this.height = 40;
+        this.width = 112;
+        this.height = 186;
  
         // PROPIEDADES
         this.vx = 0;
@@ -20,7 +20,8 @@ class Player {
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
         this.completedLevel = false;
-
+        this.worldWidth = 800;  // Ajusta según tu mapa
+        this.worldHeight = 450;
         
     }
  

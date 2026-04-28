@@ -71,10 +71,11 @@ class Sala {
             spawn.x, 
             spawn.y, 
             color,
-            this.world.width,  // <--- Enviamos el número (ej: 700)
-            this.world.height
+        
         );
         this.players.set(id, player);
+        player.worldWidth = this.world.width;
+        player.worldHeight = this.world.height;
         console.log(`${nickname} tiene asignado el color ${color}`);
 
 
@@ -133,25 +134,23 @@ class Sala {
 
         // **********colisiones***********
     isColliding(player, rect) {
-        const size = 40; // tamaño jugador
 
         return (
             player.x < rect.x + rect.width &&
-            player.x + size > rect.x &&
+            player.x + player.width > rect.x &&
             player.y < rect.y + rect.height &&
-            player.y + size > rect.y
+            player.y + player.height > rect.y
         );
     }
 
     // jugador vs jugador
     isPlayerColliding(a, b) {
-        const size = 40;
 
         return (
             a.x < b.x + size &&
-            a.x + size > b.x &&
-            a.y < b.y + size &&
-            a.y + size > b.y
+            a.x + a.width > b.x &&
+            a.y < b.y + b.height &&
+            a.y + a.height > b.y
         );
     }
     // mundo actualizado 
@@ -179,11 +178,11 @@ class Sala {
             key: {
                 // Si hay portador, la llave sigue al jugador. 
                 // Si no, se queda en su sitio original.
-                x: holder ? holder.x : this.world.key.x,
-                y: holder ? holder.y - 20 : this.world.key.y,
+                x: holder ? holder.x + (holder.width / 4) : this.world.key.x,
+                y: holder ? holder.y + 50 : this.world.key.y, 
                 collected: this.world.key.collected,
                 holderId: this.world.key.holderId
-            },
+                        },
             door: {
             opened: this.world.door.opened
         }
@@ -276,7 +275,7 @@ class Sala {
                 if (!hasKey) {
                     //10 si no tiene llave el jugador rebota contra la puerta
                     p.x = prevX;
-                    p.y = prevY;
+                    //p.y = prevY;resetera soo la x para que le jugador no se pegue a la puerta y pueda bajar
                     p.vx = 0;
                 } else {
                     //aqui controlo si el jugador que tiene la llave puede abrirla
