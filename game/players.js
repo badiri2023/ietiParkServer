@@ -21,7 +21,7 @@ class Player {
         this.onGround = false;
         this.completedLevel = false;
         this.worldWidth = 800;  // Ajusta según tu mapa
-        this.worldHeight = 450;
+        this.worldHeight = 600;
         
     }
  
