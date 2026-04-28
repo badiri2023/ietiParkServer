@@ -1,25 +1,54 @@
 const WebSocket = require('ws');
+const {MongoClient} = require('mongodb');
 const Sala = require('./game/sala');
 
+
+///---------------config Mongo
+const uri = 'mongodb://root:password@localhost:27017/';
+const client = new MongoClient(uri);
+
+
+let db;
+let Jugadors;
+let Nivells;
+let Partides;
+let Records;
+
+///--------------estado servidor
+const sala = new Sala();
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
-
-const sala = new Sala();
-
 console.log("Servidor en ws://0.0.0.0:3000");
 
+
+///-----------conexion mongo
+async function connectMongo() {
+    await client.connect();
+
+    db = client.db('pico4_db');
+
+    // Colecciones 
+    Jugadors = db.collection('jugadors');
+    //Nivells = db.collection('nivells');
+    Partides = db.collection('partides');
+    Records = db.collection('records');
+
+    console.log("MongoDB conectado");
+
+}
+
+
+let partidaActual = null;//estado partida
+/////-------Websocket server
 wss.on('connection', (ws) => {
-    console.log("Conexió feta");
+    console.log("Cliente conectado ");
 
     let myId = null;
     ws.isViewer = false;
 
-
-
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
         let msg;
-
-        // vitar crash por JSON inválido
+        // evitar crash por JSON inválido
         try {
             msg = JSON.parse(message);
         } catch {
@@ -27,16 +56,14 @@ wss.on('connection', (ws) => {
             return;
         }
 
-         //Fluter observador
+         //****Fluter observador
         if (msg.type === "JOIN_VIEWER") {
             ws.isViewer = true;
             sala.addViewer(ws);
             return;
         }
 
-    
-        // Player JOIN
-      
+        // ****Player JOIN
         if (msg.type === "JOIN") {
             myId = Math.random().toString(36).substring(2, 10);
 
@@ -50,6 +77,49 @@ wss.on('connection', (ws) => {
                 }));
                 return;
             }
+
+            await Jugadors.updateOne(
+                {_id: myId},
+                {
+                    $setOnInsert: {
+                        _id: myId,
+                        nickname: msg.nickname,
+                        createdAt: new Date(),
+                        stats: {
+                            partidas: 0,
+                            victorias: 0
+                        }
+                    }
+                },
+                { upsert: true }
+            );
+            if (!partidaActual) {
+                partidaActual = {
+                    _id: `partida_${Date.now()}`,
+                    startedAt: new Date(),
+                    players: [],
+                    actions: []
+                };
+
+                await Partides.insertOne(partidaActual);
+            }
+
+
+            // añadir jugador a partida
+            await Partides.updateOne(
+                { _id: partidaActual._id },
+                {
+                    $push: {
+                        players: {
+                            playerId: myId,
+                            nickname: msg.nickname
+                        }
+                    }
+                }
+            );
+
+
+            
             
             ws.send(JSON.stringify({
                 type: "WELCOME",
