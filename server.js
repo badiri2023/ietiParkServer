@@ -27,25 +27,14 @@ wss.on('connection', (ws) => {
             return;
         }
 
-        //Fluter observador
+         //Fluter observador
         if (msg.type === "JOIN_VIEWER") {
             ws.isViewer = true;
-            console.log("Observador  conectado");
-            sala.viewers.add(ws);
-            ws.send(JSON.stringify({
-                type: "WORLD_INIT",
-                data: sala.getWorldData() 
-            }));
-
-            //estado inicial
-            ws.send(JSON.stringify({
-                type: "STATE_UPDATE",
-                data: sala.getState()
-            }));
-
+            sala.addViewer(ws);
             return;
         }
 
+    
         // Player JOIN
       
         if (msg.type === "JOIN") {

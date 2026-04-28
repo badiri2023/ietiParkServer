@@ -153,6 +153,8 @@ class Sala {
             a.y + a.height > b.y
         );
     }
+
+    
     // mundo actualizado 
     getWorldData() {
         return {
@@ -192,19 +194,14 @@ class Sala {
     }
     //flutter 
 
-   addViewer(ws) {
+    addViewer(ws) {
         this.viewers.add(ws);
 
         console.log("Observador conectado");
 
         ws.send(JSON.stringify({
-            type: "WORLD_INIT",
-            data: {
-                width: this.world.width,
-                height: this.world.height,
-                obstacles: this.world.obstacles,
-                door: this.world.door
-            }
+        type: "WORLD_INIT",
+        data: this.getWorldData()
         }));
 
         ws.send(JSON.stringify({
@@ -225,7 +222,7 @@ class Sala {
             this.world.key.collected = true;
             this.world.key.holderId = p.id;
 
-            console.log(`${p.nickname} ha cogido la llave`);
+            console.log(`${p.nickname} tiene la llave`);
 
             this.broadcast("KEY_COLLECTED", {
                 playerId: p.id
@@ -268,7 +265,6 @@ class Sala {
 
             // LLAVE
             this.checkKeyCollision(p);
-
             // si la puerta aún está cerrada
             if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
 
@@ -282,14 +278,25 @@ class Sala {
                 } else {
                     //aqui controlo si el jugador que tiene la llave puede abrirla
                     this.world.door.opened = true;
-
                     console.log(`Puerta abierta por ${p.nickname}`);
-
                     this.broadcast("DOOR_OPENED", {
                         playerId: p.id
                     });
                 }
             }
+            //detectar que cruzan la puerta
+            if (this.world.door.opened && this.isColliding(p, this.world.door)) {
+                if (!p.finished) {
+                    p.finished = true;
+
+                    console.log(`${p.nickname} ha cruzado la puerta`);
+
+                    this.broadcast("PLAYER_EXITED", {
+                        playerId: p.id
+                    });
+                }
+            }
+            
             
 
             // Colisión con otros jugadores (AHORA ESTÁ DENTRO DEL BUCLE)
@@ -308,10 +315,19 @@ class Sala {
                     } else {
                         // Colisión lateral normal (el jugador rebota/se bloquea)
                         p.x = prevX; 
-    }
+                    }
                 }
             }
         }
+        const allFinished = Array.from(this.players.values()).every(p => p.finished);
+
+            if (allFinished && !this.levelCompleted) {
+                this.levelCompleted = true;
+
+                console.log("Nivel completado");
+
+                this.broadcast("LEVEL_COMPLETED", {});
+            }
         const state = this.getState();
         //console.log("DEBUG SERVER:", JSON.stringify(state));
         //console.log("WORLD:", this.world.width, this.world.height);

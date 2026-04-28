@@ -16,10 +16,10 @@ class Player {
         this.vx = 0;
         this.vy = 0;
         this.color = color;
-      
+        this.finished = false;
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
-        this.completedLevel = false;
+        //this.completedLevel = false;
         this.worldWidth = world.width;  // Ajusta según tu mapa
         this.worldHeight = world.height;
         
@@ -32,6 +32,14 @@ class Player {
 
     // Actualización por tick
     update() {
+        //si cruzó la puerta se bloque el jugador
+        if (this.finished) {
+            this.vx = 0;
+            this.vy = 0;
+            this.input.left = false;
+            this.input.right = false;
+            this.input.jump = false;
+        }
         //SERVER: Implementació dels salts i col·lisions entre usuaris (“s’apilen” un sobre l’altre) 
        const speed = 5;
 
@@ -54,13 +62,11 @@ class Player {
 
         // --- FÍSICA ---
         this.vy += gravity;
-
         this.x += this.vx;
         this.y += this.vy;
 
         // --- SUELO CORRECTO ---
         const floorY = this.worldHeight - this.height;
-
         if (this.y >= floorY) {
             this.y = floorY;
             this.vy = 0;
@@ -69,11 +75,11 @@ class Player {
 
         // --- PAREDES ---
         if (this.x < 0) this.x = 0;
-
         if (this.x > this.worldWidth - this.width) {
             this.x = this.worldWidth - this.width;
         }
-        }
+        
+    }
 }
 
 module.exports = Player
