@@ -84,12 +84,13 @@ wss.on('connection', (ws) => {
                     return;
                 }
 
-            await Jugadors.updateOne(
+            await Jugadors.updateOne(//revisar lo que guardo en colecciones
                 {_id: myId},
                 {
                     $setOnInsert: {
                         
                         nickname: msg.nickname,
+
                         descp:{
                             _id: myId,
                             color: sala.players.color
