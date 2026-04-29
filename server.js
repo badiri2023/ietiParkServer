@@ -4,7 +4,8 @@ const Sala = require('./game/sala');
 
 
 ///---------------config Mongo
-const uri = 'mongodb://root:password@localhost:27017/';
+//const uri = 'mongodb://root:password@localhost:27017/';
+const uri ='mongodb://localhost:27017/pico4_db'
 const client = new MongoClient(uri);
 
 
