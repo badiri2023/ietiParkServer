@@ -10,7 +10,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
+        this.gameStarted = false; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
         this.levelCompleted = false;
@@ -307,6 +307,7 @@ class Sala {
                     p.x = prevX;
                     //p.y = prevY;resetera soo la x para que le jugador no se pegue a la puerta y pueda bajar
                     p.vx = 0;
+                    console.log(`${p.nickname} no puedes pasar, no tienes la llave`);
                 } else {
                     //aqui controlo si el jugador que tiene la llave puede abrirla
                     this.world.door.opened = true;
