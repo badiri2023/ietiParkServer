@@ -44,9 +44,9 @@ class World {
         
         this.key = {
             x: keySprite ? keySprite.x : 200,
-            y:  keySprite ? (keySprite.y - 250) : 50,
+            y:  keySprite ? keySprite.y : 50,
             width: keySprite.width,
-            height:keySprite.height,
+            height: keySprite ? (keySprite.height + 80) : 112,
             collected: false,
             holderId: null
         };
