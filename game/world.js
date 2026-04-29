@@ -15,7 +15,6 @@ class World {
         //this.height = Math.max(...level.sprites.map(s => s.y + s.height));
         this.width=800;
         this.height=400;
-        const doorSprite = level.sprites.find(s => s.type === "door");
         
         if (doorSprite) {
             this.door = {
