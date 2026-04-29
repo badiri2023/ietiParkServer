@@ -70,7 +70,7 @@ wss.on('connection', (ws) => {
             myId = Math.random().toString(36).substring(2, 10);
 
             const result = sala.addPlayer(myId, msg.nickname, ws);
-            console.log("Resultado de addPlayer:", result);
+            //console.log("Resultado de addPlayer:", result);
 
             if (!result.success) {
                 ws.send(JSON.stringify({
