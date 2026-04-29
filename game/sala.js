@@ -4,7 +4,6 @@ const World = require('./world');
 const COLORS = require('./colors');
 
 
-
 class Sala {
     constructor() {
         this.players = new Map();
@@ -210,11 +209,16 @@ class Sala {
                 collected: this.world.key.collected,
                 holderId: this.world.key.holderId
                         },
-            door: {
+            /*door: {
                 x: this.world.door.x,
                 y: this.world.door.y,
             opened: this.world.door.opened
-        }
+        }*/
+        door: this.world?.door ? {
+        x: this.world.door.x,
+        y: this.world.door.y,
+        opened: this.world.door.opened
+    } : null
         };
     }
     //flutter 
@@ -293,8 +297,8 @@ class Sala {
             // LLAVE
             this.checkKeyCollision(p);
             // si la puerta aún está cerrada
-            if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
-
+            //if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
+            if (this.world?.door && !this.world.door.opened && this.isColliding(p, this.world.door)) {
                 const hasKey = this.world.key.holderId === p.id;
                 
                 if (!hasKey) {
@@ -312,7 +316,8 @@ class Sala {
                 }
             }
             //detectar que cruzan la puerta
-            if (this.world.door.opened && this.isColliding(p, this.world.door)) {
+            //if (this.world.door.opened && this.isColliding(p, this.world.door)) {
+            if (this.world?.door?.opened && this.isColliding(p, this.world.door)) {
                 if (!p.finished) {
                     p.finished = true;
 
@@ -352,6 +357,7 @@ class Sala {
             this.levelCompleted = true;
             console.log("Nivel completado con éxito");
             this.broadcast("LEVEL_COMPLETED", {});
+            return;
         }
         const state = this.getState();
         //console.log("DEBUG SERVER:", JSON.stringify(state));

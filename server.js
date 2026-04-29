@@ -162,7 +162,7 @@ wss.on('connection', (ws) => {
                     {
                         $push: {
                             actions: {
-                                playerNickname: myId,
+                                playerID: myId,
                                 actions, 
                                 timestamp: new Date()
                             }
@@ -179,7 +179,7 @@ wss.on('connection', (ws) => {
             return;
         }
         if (myId) {
-        sala.handlePlayerDisconnect(myId);
+        sala.removePlayer(myId);
         }
        /* if (myId) {
             const player = sala.getPlayer(myId);

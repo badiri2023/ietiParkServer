@@ -15,14 +15,20 @@ class World {
         //this.height = Math.max(...level.sprites.map(s => s.y + s.height));
         this.width=800;
         this.height=400;
-
-        this.door = {
-            x: doorSprite.x,
-            y: doorSprite.y,
-            width: doorSprite.width,
-            height: doorSprite.height,
-            opened :false
-        };
+        const doorSprite = level.sprites.find(s => s.type === "door");
+        
+        if (doorSprite) {
+            this.door = {
+                x: doorSprite.x,
+                y: doorSprite.y,
+                width: doorSprite.width,
+                height: doorSprite.height,
+                opened: false
+            };
+        } else {
+            console.warn("ya no hay puerta");
+            this.door = null; 
+        }
 
         //  SPAWNS (jugadores)
         this.spawns = level.sprites

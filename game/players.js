@@ -35,10 +35,27 @@ class Player {
         if (this.finished) {
             this.vx = 0;
             this.vy = 0;
-            this.input.left = false;
+            /*this.input.left = false;
             this.input.right = false;
-            this.input.jump = false;
+            this.input.jump = false;*/
+            return;
         }
+
+        //revisar para mejorar la friccion
+        /*const accel = 0.5;
+const maxSpeed = 5;
+const friction = 0.8;
+
+if (this.input.left) this.vx -= accel;
+if (this.input.right) this.vx += accel;
+
+// límite velocidad
+this.vx = Math.max(-maxSpeed, Math.min(maxSpeed, this.vx));
+
+// fricción
+if (!this.input.left && !this.input.right) {
+    this.vx *= friction;
+}*/ 
         //SERVER: Implementació dels salts i col·lisions entre usuaris (“s’apilen” un sobre l’altre) 
        const speed = 5;
 
