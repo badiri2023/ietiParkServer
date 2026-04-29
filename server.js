@@ -150,17 +150,20 @@ wss.on('connection', (ws) => {
             player.input.jump = msg.jump;
             //console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
              if (partidaActual) {
+                const actions = [];
+
+                if (msg.left) actions.push("LEFT");
+                if (msg.right) actions.push("RIGHT");
+                if (msg.jump) actions.push("JUMP");
+                 if (actions.length === 0) return; //no guardamos nada si no hay accion
+
                 await Partides.updateOne(
                     { _id: partidaActual._id },
                     {
                         $push: {
                             actions: {
                                 playerId: myId,
-                                input: {
-                                    left: msg.left,
-                                    right: msg.right,
-                                    jump: msg.jump
-                                },
+                                actions, 
                                 timestamp: new Date()
                             }
                         }
