@@ -88,9 +88,14 @@ wss.on('connection', (ws) => {
                 {_id: myId},
                 {
                     $setOnInsert: {
-                        _id: myId,
+                        
                         nickname: msg.nickname,
-                        color: msg.color,
+                        descp:{
+                            _id: myId,
+                            color: sala.players.color
+
+                        },
+                       
                         /*createdAt: new Date(),
                         stats: {
                             partidas: 0,
