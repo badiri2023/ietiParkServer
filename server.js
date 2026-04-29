@@ -90,11 +90,12 @@ wss.on('connection', (ws) => {
                     $setOnInsert: {
                         _id: myId,
                         nickname: msg.nickname,
-                        createdAt: new Date(),
+                        color: msg.color,
+                        /*createdAt: new Date(),
                         stats: {
                             partidas: 0,
                             victorias: 0
-                        }
+                        }*/
                     }
                 },
                 { upsert: true }
