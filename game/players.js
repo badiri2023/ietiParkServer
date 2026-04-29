@@ -10,7 +10,7 @@ class Player {
         this.y = spawnY;
         // hitbox de los jugadores
         this.width = 30;
-        this.height = 60;
+        this.height = 90;
  
         // PROPIEDADES
         this.vx = 0;
