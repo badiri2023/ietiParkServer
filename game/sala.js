@@ -77,7 +77,7 @@ class Sala {
         this.players.set(id, player);
     
         console.log(`${nickname} tiene asignado el color ${color}`);
-        console.log(`WORLD: ${this.world.width}x${this.world.height}`);
+       // console.log(`WORLD: ${this.world.width}x${this.world.height}`);
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
             ws.send(JSON.stringify({

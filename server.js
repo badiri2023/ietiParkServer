@@ -163,7 +163,7 @@ wss.on('connection', (ws) => {
                         $push: {
                             actions: {
                                 playerID: myId,
-                                playerNick: nickname,
+                                //playerNick: nickname,
                                 actions, 
                                 timestamp: new Date()
                             }
