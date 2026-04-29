@@ -8,7 +8,6 @@ const Sala = require('./game/sala');
 const uri ='mongodb://localhost:27017/pico4_db'
 const client = new MongoClient(uri);
 
-
 let db;
 let Jugadors;
 let Nivells;
@@ -149,7 +148,7 @@ wss.on('connection', (ws) => {
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
-            console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
+            //console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
              if (partidaActual) {
                 await Partides.updateOne(
                     { _id: partidaActual._id },

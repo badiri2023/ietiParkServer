@@ -34,13 +34,13 @@ class World {
 
         //  OBSTÁCULOS (por ahora vacío)
         this.obstacles = [];
-        console.log("Mundo iniciado con éxito:");
-        console.log("- Puerta en:", this.door.x, this.door.y);
-        console.log("- Spawn en:", this.spawns[0]);
+        //console.log("Mundo iniciado con éxito:");
+        //console.log("- Puerta en:", this.door.x, this.door.y);
+        //console.log("- Spawn en:", this.spawns[0]);
         //key 13 gestiono estado key
         const keySprite = level.sprites.find(s => s.type === "key");
     
-        console.log("Spawn encontrado:", level.sprites.find(s => s.type === "player1"));
+        //console.log("Spawn encontrado:", level.sprites.find(s => s.type === "player1"));
         
         this.key = {
             x: keySprite ? keySprite.x : 200,
