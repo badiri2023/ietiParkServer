@@ -1,40 +1,35 @@
 const levelData = require('./game_data.json');
+
 class World {
     constructor(levelIndex = 0) {
         this.levelIndex = levelIndex;
         this.loadLevel(levelIndex);
     }
+
     loadLevel(index) {
-        const level = levelData.levels[index].zones || [];
+        // 1. Obtenemos el objeto del nivel completo, NO solo las zonas
+        const level = levelData.levels[index];
+        
         if (!level) {
-            console.error("Nivel no existe:", index);
+            console.error("El nivel no existe en el índice:", index);
             return;
         }
-         // reset total por nivel
+
+        // 2. Limpiamos estado anterior
         this.resetLevelState();
 
-
+        // 3. Asignamos propiedades con valores por defecto por seguridad
         this.currentLevel = level;
         this.sprites = level.sprites || [];
         this.layers = level.layers || [];
         this.zones = level.zones || [];
-
-        ///#####hablar con Bad para medidas del mundo por que el nivel 2 es mas grande
-        //tamaño mundo lo ajuste por que el viewport es muy pequeño 
-        //this.width = level.viewportWidth;
-        //this.height = level.viewportHeight;
-       //this.width = 1500;
-        //this.height = 600;
-            //console.log("LEVEL:", level);
-       
-
-        // tamaño mundo
+        
+        // Medidas del mundo
         this.width = level.viewportWidth || 1500;
         this.height = level.viewportHeight || 600;
 
-
-        //-----Puerta-------
-        const doorSprite = this.sprites.find(s => s.type === "door");
+        // 4. Buscar la PUERTA (Ajustado a "exitdoor" si así está en tu JSON)
+        const doorSprite = this.sprites.find(s => s.type === "door" || s.type === "exitdoor");
         this.door = doorSprite ? {
             x: doorSprite.x,
             y: doorSprite.y,
@@ -43,28 +38,23 @@ class World {
             opened: false
         } : null;
 
-        ///------spawns------
+        // 5. SPAWNS
         this.spawns = this.sprites
-            .filter(s => s.type === "player1"|| s.type === "skeleton1")
-            .map(s => ({
-                x: s.x,
-                y: s.y
-            }));
+            .filter(s => s.type === "player1" || s.type === "skeleton1" || s.type === "spawn")
+            .map(s => ({ x: s.x, y: s.y }));
 
-        //-----key-----
+        // 6. LLAVE
         const keySprite = this.sprites.find(s => s.type === "key");
         this.key = {
             x: keySprite ? keySprite.x : 200,
-            y:  keySprite ? (keySprite.y - 50) : 50,
-            width: keySprite.width,
-            height: keySprite ? (keySprite.height + 80) : 112,            
+            y: keySprite ? keySprite.y : 50,
+            width: keySprite ? keySprite.width : 50,
+            height: keySprite ? keySprite.height : 50,
             collected: false,
             holderId: null
         };
 
-        //palanca nivel 2
-
-
+        // 7. PALANCA (Nivel 2)
         const palancaSprite = this.sprites.find(s => s.type === "palanca");
         this.palanca = palancaSprite ? {
             x: palancaSprite.x,
@@ -74,33 +64,53 @@ class World {
             activated: false
         } : null;
 
+        // 8. PLATAFORMA MÓVIL (Basada en zonas del Nivel 2)
+        const platZone = this.zones.find(z => z.type === "plataforma");
+        this.movingPlatform = platZone ? {
+            x: platZone.x,
+            y: platZone.y,
+            width: platZone.width,
+            height: platZone.height,
+            direction: 1,
+            speed: 2
+        } : null;
 
-            //  OBSTÁCULOS (por ahora vacío), para segundo nivel
-        this.obstacles = [];
-        console.log(`Nivel cargado: ${level.name}`);
+        // 9. PRECIPICIO (Basada en zonas del Nivel 2)
+        const precipicioZone = this.zones.find(z => z.type === "precipicio");
+        this.precipicio = precipicioZone ? {
+            x: precipicioZone.x,
+            y: precipicioZone.y,
+            width: precipicioZone.width,
+            height: precipicioZone.height
+        } : null;
+
+        // 10. OBSTÁCULOS (Suelos)
+        this.obstacles = this.zones
+            .filter(z => z.name === "suelo")
+            .map(z => ({ x: z.x, y: z.y, width: z.width, height: z.height }));
+
+        console.log(`Nivel cargado correctamente: ${level.name || index}`);
     }
+
     resetLevelState() {
         this.door = null;
         this.key = null;
         this.palanca = null;
+        this.movingPlatform = null;
+        this.precipicio = null;
         this.obstacles = [];
     }
 
     nextLevel() {
         const next = this.levelIndex + 1;
-
         if (next >= levelData.levels.length) {
-            console.log("No hay más niveles");
+            console.log("Fin del juego: No hay más niveles");
             return false;
         }
-
         this.levelIndex = next;
         this.loadLevel(next);
         return true;
-    }      
-        
-    
-
+    }
 }
 
 module.exports = World;
