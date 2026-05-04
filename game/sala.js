@@ -6,7 +6,7 @@ let Partides;
 
 
 class Sala {
-    constructor() {
+    constructor(partidesCollection) {
         this.players = new Map();
         this.minPlayers = 2;
         this.maxPlayers = 8;
