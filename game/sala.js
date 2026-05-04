@@ -2,8 +2,6 @@ const WebSocket = require('ws');
 const Player = require('./players');
 const World = require('./world');
 const COLORS = require('./colors');
-let Partides;
-
 
 class Sala {
     constructor(partidesCollection) {
