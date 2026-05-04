@@ -15,6 +15,8 @@ class Sala {
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
         this.levelCompleted = false;
         this.availableColors = [...COLORS];
+
+        this.keyTakenInfo = null; 
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
     }
@@ -266,8 +268,13 @@ class Sala {
         if (this.isColliding(p, this.world.key)) {
             this.world.key.collected = true;
             this.world.key.holderId = p.id;
+            this.keyTakenInfo = {
+                id: p.id,
+                nickname: p.nickname
+            };
 
             console.log(`${p.nickname} tiene la llave`);
+            this.saveKeyTaken(p);
 
             this.broadcast("KEY_COLLECTED", {
                 playerId: p.id
@@ -388,6 +395,13 @@ class Sala {
                 console.log("terminado")
                 return;
             }
+            await Partides.insertOne({
+                partidaNumero: partidaNumero,
+                fecha: new Date(),
+                keyTaken: this.world.key.holderId !== null,
+                keyHolderId: this.world.key.holderId,
+                keyHolderNick: this.keyTakenInfo?.nickname || null
+            });
             
             // reseteo jugadores
             const playerUpdate = [];
@@ -418,6 +432,26 @@ class Sala {
             this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
         }
     }
+    async saveKeyTaken(player) {
+    try {
+        await Partides.updateOne(
+            { _id: partidaActual._id },
+            {
+                $set: {
+                    keyTaken: true,
+                    keyHolderId: player.id,
+                    keyHolderNick: player.nickname,
+                    keyTakenAt: new Date()
+                }
+            },
+            { upsert: true }
+        );
+
+        console.log("Llave guardada en Mongo");
+    } catch (err) {
+        console.error("Error guardando llave:", err);
+    }
+}
     
 }
 
