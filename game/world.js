@@ -11,8 +11,10 @@ class World {
         // =========================
         // WORLD SIZE (FIJO, NO DINÁMICO)
         // =========================
-        this.width = level.viewportWidth;
-        this.height = level.viewportHeight;
+        //this.width = level.viewportWidth;
+        //this.height = level.viewportHeight;
+        this.width = 1500;
+        this.height = 800;
 
         console.log("LEVEL SIZE:", this.width, this.height);
 
