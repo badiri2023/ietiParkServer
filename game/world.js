@@ -10,6 +10,7 @@ class World {
             console.error("Nivel no existe:", index);
             return;
         }
+        this.resetLevelState();
 
 
         this.currentLevel = level;
@@ -20,15 +21,15 @@ class World {
         //tamaño mundo lo ajuste por que el viewport es muy pequeño 
         //this.width = level.viewportWidth;
         //this.height = level.viewportHeight;
-       //this.width = 1500;
-        //this.height = 600;
+        this.width = 1500;
+        this.height = 600;
             //console.log("LEVEL:", level);
         // reset total por nivel
-        this.resetLevelState();
+        
 
         // tamaño mundo
-        this.width = level.viewportWidth || 1500;
-        this.height = level.viewportHeight || 600;
+        //this.width = level.viewportWidth || 1500;
+        //this.height = level.viewportHeight || 600;
 
 
         //-----Puerta-------
