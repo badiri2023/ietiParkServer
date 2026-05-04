@@ -12,10 +12,10 @@ class World {
         }
 
 
-        this.currentLevel = level;
-        this.sprites = level.sprites || [];
-        this.layers = level.layers || [];
-        this.zones = level.zones || [];
+        this.currentLevel = levelZones;
+        this.sprites = levelZones.sprites || [];
+        this.layers = levelZones.layers || [];
+        this.zones = levelZones.zones || [];
 
         ///#####hablar con Bad para medidas del mundo por que el nivel 2 es mas grande
         //tamaño mundo lo ajuste por que el viewport es muy pequeño 
