@@ -116,7 +116,7 @@ class Sala {
                 players: []
             });
         }
-        await Partides.updateOne(
+        await this.Partides.updateOne(
             { _id: this.partidaId },
             {
                 $push: {
