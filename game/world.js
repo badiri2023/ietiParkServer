@@ -21,9 +21,8 @@ class World {
         //tamaño mundo lo ajuste por que el viewport es muy pequeño 
         //this.width = level.viewportWidth;
         //this.height = level.viewportHeight;
-       //this.width = 1500;
-        //this.height = 600;
-        console.log("LEVEL:", level);
+     
+        console.log("LEVELLLLL:", level);
         // reset total por nivel
        
 
@@ -36,7 +35,7 @@ class World {
         const doorSprite = level.sprites.find(s => s.type === "door");
         this.door = doorSprite ? {
             x: doorSprite.x,
-            y: 150,
+            y: 50,
             width: doorSprite.width,
             height: doorSprite.height,
             opened: false
