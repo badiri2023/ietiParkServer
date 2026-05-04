@@ -1,107 +1,105 @@
-const levelData = require('./game_data.json');
+const fs = require('fs');
+const path = require('path');
+const gameData = require('./game_data.json'); // El JSON principal que pasaste
+
 class World {
     constructor(levelIndex = 0) {
         this.levelIndex = levelIndex;
         this.loadLevel(levelIndex);
     }
+
     loadLevel(index) {
-        const level = levelData.levels[index];
+        const level = gameData.levels[index];
         if (!level) {
-            console.error("Nivel no existe:", index);
+            console.error(`[ERROR] No existe el nivel en el índice: ${index}`);
             return;
         }
-        //reseteo  antes de cargar mundo
+
         this.resetLevelState();
-
-
         this.currentLevel = level;
-        this.sprites = level.sprites || [];
-        this.layers = level.layers || [];
 
-        ///#####hablar con Bad para medidas del mundo por que el nivel 2 es mas grande
-        //tamaño mundo lo ajuste por que el viewport es muy pequeño 
-        //this.width = level.viewportWidth;
-        //this.height = level.viewportHeight;
-        this.width = 1500;
-        this.height = 600;
-        console.log("LEVEL:", level);
-     
-        
+        // --- CARGA DINÁMICA DEL ARCHIVO DE ZONAS ---
+        try {
+            // Buscamos el archivo que dice "zonesFile" (ej: zones/level_000_zones.json)
+            const absolutePath = path.join(__dirname, level.zonesFile);
+            const zonesRaw = fs.readFileSync(absolutePath, 'utf8');
+            const zonesData = JSON.parse(zonesRaw);
+            this.zones = zonesData.zones || [];
+            
+            console.log(`[WORLD] Cargado ${level.name}. Zonas leídas de: ${level.zonesFile}`);
+        } catch (err) {
+            console.error(`[ERROR] No se pudo cargar el archivo de zonas: ${level.zonesFile}`);
+            this.zones = [];
+        }
 
-        // tamaño mundo
-        //this.width = level.viewportWidth || 1500;
-        //this.height = level.viewportHeight || 600;
+        // --- PROCESAR OBSTÁCULOS (Colisiones de suelo) ---
+        // Filtramos por el nombre "suelo" que vimos en tu JSON de zonas
+        this.obstacles = this.zones
+            .filter(z => z.name === "suelo" || z.type === "Default")
+            .map(z => ({
+                x: z.x,
+                y: z.y,
+                width: z.width,
+                height: z.height
+            }));
 
+        // --- SPAWNS ---
+        const spawnZ = this.zones.find(z => z.type === "spawn");
+        this.spawns = spawnZ ? [{ x: spawnZ.x, y: spawnZ.y }] : [{ x: 100, y: 100 }];
 
-        //-----Puerta-------
-        const doorSprite = this.sprites.find(s => s.type === "door");
-        this.door = doorSprite ? {
-            x: doorSprite.x,
-           // y: doorSprite.y,
-           y:0,
-            width: doorSprite.width,
-            height: doorSprite.height,
+        // --- PUERTA ---
+        const doorZ = this.zones.find(z => z.type === "exitdoor");
+        this.door = doorZ ? {
+            x: doorZ.x,
+            y: doorZ.y,
+            width: doorZ.width,
+            height: doorZ.height,
             opened: false
         } : null;
 
-        ///------spawns------
-        this.spawns = this.sprites
-            .filter(s => s.type === "player1"|| s.type === "skeleton1")
-            .map(s => ({
-                x: s.x,
-                y: s.y
-            }));
-
-        //-----key-----
-        const keySprite = level.sprites.find(s => s.type === "key");
+        // --- LLAVE ---
+        const keyZ = this.zones.find(z => z.type === "key");
         this.key = {
-            x: keySprite ? keySprite.x : 200,
-            y:  keySprite ? (keySprite.y - 50) : 50,
-            width: keySprite.width,
-            height: keySprite ? (keySprite.height + 80) : 112,            
+            x: keyZ ? keyZ.x : 0,
+            y: keyZ ? keyZ.y : 0,
+            width: keyZ ? keyZ.width : 32,
+            height: keyZ ? keyZ.height : 32,
             collected: false,
             holderId: null
         };
 
-        //palanca nivel 2
-
-
-        const palancaSprite = this.sprites.find(s => s.type === "palanca");
-        this.palanca = palancaSprite ? {
-            x: palancaSprite.x,
-            y: palancaSprite.y,
-            width: palancaSprite.width,
-            height: palancaSprite.height,
+        // --- PALANCA (Para el Nivel 2) ---
+        const palancaZ = this.zones.find(z => z.type === "palanca");
+        this.palanca = palancaZ ? {
+            x: palancaZ.x,
+            y: palancaZ.y,
+            width: palancaZ.width,
+            height: palancaZ.height,
             activated: false
         } : null;
 
-
-            //  OBSTÁCULOS (por ahora vacío), para segundo nivel
-        this.obstacles = [];
-        //console.log(`Nivel cargado: ${level.name}`);
+        // Ajustamos dimensiones del mundo para el servidor
+        this.width = 2000; 
+        this.height = 600;
     }
+
     resetLevelState() {
+        this.obstacles = [];
+        this.zones = [];
         this.door = null;
         this.key = null;
         this.palanca = null;
-        this.obstacles = [];
     }
 
     nextLevel() {
         const next = this.levelIndex + 1;
-
-        if (next >= levelData.levels.length) {
-            console.log("FIN.....");
-            return false;
+        if (next < gameData.levels.length) {
+            this.levelIndex = next;
+            this.loadLevel(this.levelIndex);
+            return true;
         }
-
-        this.levelIndex = next;
-        this.loadLevel(next);
-        return true;
-    }      
-        
-    
-
+        return false;
+    }
 }
 
 module.exports = World;
