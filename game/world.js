@@ -30,6 +30,8 @@ class World {
 
         //-----Puerta-------
         const doorSprite = level.sprites.find(s => s.type === "door");
+        const ALTO_VISUAL_APP = 100; 
+    const WORLD_HEIGHT_APP = 800;
         this.door = doorSprite ? {
             x: doorSprite.x,
             y: doorSprite.y,
