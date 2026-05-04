@@ -19,13 +19,13 @@ class World {
 
         ///#####hablar con Bad para medidas del mundo por que el nivel 2 es mas grande
         //tamaño mundo lo ajuste por que el viewport es muy pequeño 
-        //this.width = level.viewportWidth;
-        //this.height = level.viewportHeight;
+        this.width = level.viewportWidth;
+        this.height = level.viewportHeight;
      
         //onsole.log("LEVELLLLL:", level);
         // reset total por nivel
-        this.width =  1500;
-        this.height =  600;
+        //this.width =  1500;
+        //this.height =  600;
 
 
         //-----Puerta-------
