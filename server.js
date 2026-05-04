@@ -79,24 +79,33 @@ wss.on('connection', (ws) => {
                 }));
                 return;
             }
-            const playerActual = sala.getPlayer(myId);
-            if (Jugadors) {
-                try {
-                    await Jugadors.updateOne(
-                        { nickname: msg.nickname }, // Buscamos por nombre para no duplicar
-                        {
-                            $set: { 
-                                _id: myId,            // Actualizamos el ID actual
-                                color: playerActual.color, // Guardamos su color asignado
-                                lastLogin: new Date()
-                            }
-                        },
-                        { upsert: true } // Si no existe, lo crea. Si existe, lo actualiza.
-                    );
-                } catch (err) {
-                    console.error("Error guardando jugador en Mongo:", err);
+            if (!Jugadors) {
+                    console.log("Mongo no listo aún");
+                    return;
                 }
-            }
+
+            await Jugadors.updateOne(//revisar lo que guardo en colecciones
+                {_id: myId},
+                {
+                    $setOnInsert: {
+                        
+                        nickname: msg.nickname,
+
+                        descp:{
+                            _id: myId,
+                            color: sala.players.color
+
+                        },
+                       
+                        /*createdAt: new Date(),
+                        stats: {
+                            partidas: 0,
+                            victorias: 0
+                        }*/
+                    }
+                },
+                { upsert: true }
+            );
             if (!partidaActual) {
                 partidaActual = {
                     _id: `partida_${Date.now()}`,

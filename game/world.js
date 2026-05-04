@@ -10,6 +10,7 @@ class World {
             console.error("Nivel no existe:", index);
             return;
         }
+        //reseteo  antes de cargar mundo
         this.resetLevelState();
 
 
@@ -24,7 +25,7 @@ class World {
         this.width = 1500;
         this.height = 600;
             //console.log("LEVEL:", level);
-        // reset total por nivel
+     
         
 
         // tamaño mundo
