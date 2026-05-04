@@ -6,8 +6,8 @@ class Player {
         this.ws = ws;
 
         // POSICIÓN: Viene de los cálculos de tu Sala
-        this.x = spawnX;
-        this.y = spawnY;
+        this.x = 0;
+        this.y = ;
         // hitbox de los jugadores
         this.width = 30;
         this.height = 90;
