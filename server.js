@@ -16,7 +16,7 @@ let Records;
 
 ///--------------estado servidor
 //const sala = new Sala();
-const sala = new Sala(Partides);
+let sala;
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 console.log("Servidor en ws://0.0.0.0:3000");
@@ -37,6 +37,14 @@ async function connectMongo() {
     console.log("MongoDB conectado");
 
 }
+async function start() {
+    await connectMongo();
+
+    sala = new Sala(Partides);
+
+    console.log("Servidor listo");
+}
+start();
 
 
 let partidaActual = null;//estado partida
@@ -99,30 +107,6 @@ wss.on('connection', (ws) => {
                     console.error("Error guardando jugador en Mongo:", err);
                 }
             }
-            if (!partidaActual) {
-                partidaActual = {
-                    _id: `partida_${Date.now()}`,
-                    startedAt: new Date(),
-                    players: [],
-                    actions: []
-                };
-
-                await Partides.insertOne(partidaActual);
-            }
-            // añadir jugador a partida
-            await Partides.updateOne(
-                { _id: partidaActual._id },
-                {
-                    $push: {
-                        players: {
-                            playerId: myId,
-                            nickname: msg.nickname
-                        }
-                    }
-                }
-            );
-
-
             
             
             ws.send(JSON.stringify({
@@ -176,7 +160,3 @@ wss.on('connection', (ws) => {
     });
 });
 
-async function start() {
-    await connectMongo();
-}
-start();
