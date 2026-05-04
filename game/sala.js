@@ -39,9 +39,7 @@ class Sala {
         const color = this.availableColors.shift();
         const spawn = this.world.spawns[this.players.size % this.world.spawns.length];
 
-        const prueba= 0;
-     
-
+        console.log(`[SPAWN] Asignando posición: x=${spawn?.x}, y=${spawn?.y}`);
         // 1. Definim els punts de sortida
        /* const spawnPoints = [
              { x: 70, y: 500 },
@@ -81,6 +79,7 @@ class Sala {
        // console.log(`WORLD: ${this.world.width}x${this.world.height}`);
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
+            console.log(`[WORLD_INIT] Enviando datos del mundo a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
                 data: this.getWorldData() // Usamos el método que separamos antes
@@ -218,7 +217,8 @@ class Sala {
             x: this.world.door.x,
             y: this.world.door.y,
             opened: this.world.door.opened
-            } : null
+            } : null,
+            palanca: this.world.palanca
         };
     }
     //flutter 
@@ -376,7 +376,7 @@ class Sala {
             }
             
             // reseteo jugadores
-            const playersUpdate = [];
+            const playerUpdate = [];
             let i = 0;
             for (const p of this.players.values()) {
                 const spawn = this.world.spawns[i % this.world.spawns.length];
