@@ -1,3 +1,261 @@
+
+Jessica Carb
+jess180
+Invisible
+
+Jessica Carb
+ — 
+4/27/26, 7:20 PM
+recordad lo cojo todo del game_data.json
+BepBop
+ — 
+4/27/26, 7:21 PM
+ponle las comillas
+
+{
+  "type": "JOIN",
+  "data": {
+    "nickname": "NombreUsuario"
+  }
+}
+
+INPUT
+{
+  "type": "INPUT",
+  "data": {
+    "left": true,
+    "right": false,
+    "jump": false
+  }
+}
+
+WORL_INIT
+{
+  "type": "WORLD_INIT",
+  "data": {
+    "width": 400,
+    "height": 200,
+    "layers": [],
+    "door": { "x": 618, "y": 280, "opened": false },
+    "key": { "x": 387, "y": 302, "collected": false }
+  }
+}
+
+
+STATE_UPDATE
+{
+  "type": "STATE_UPDATE",
+  "data": {
+    "players": [
+      { "id": "p1", "x": 100, "y": 200, "nickname": "Jugador1", "color": "red" }
+    ],
+    "key": { "x": 387, "y": 302, "collected": false, "holderId": null }
+  }
+}
+
+KEY_COLLECTED
+
+{
+  "type": "KEY_COLLECTED",
+  "data": {
+    "playerId": "abc123"
+  }
+}
+
+
+
+DOOR_OPENED
+
+{
+  "type": "DOOR_OPENED",
+  "data": {
+    "playerId": "abc123"
+  }
+}
+
+{
+  "type": "KEY_COLLECTED",
+  "data": {
+    "playerId": "abc123"
+  }
+}
+
+
+PLAYER_EXITED( aun falta revisar)
+{
+  "type": "PLAYER_EXITED",
+  "data": {
+    "playerId": "abc123",
+    "nickname": "Pepe"
+  }
+}
+
+LEVEL_COMPLETE( aun falta revisar)
+
+{
+  "type": "LEVEL_COMPLETE",
+  "data": {}
+}
+
+Carlos M [toki], 
+ — 
+4/28/26, 3:42 PM
+Por lo que veo, entonces la puerta tiene animación al abrirse, o usamos sólo el sprite cerrado y el sprite abierto @Jessica Carb @BepBop 
+y si sí la animamos, se anima en cuanto opened es true? 
+o al revés, primero animación luego opened = true?
+porque al revés sería más complicado para la web
+ [toki], 
+Jessica Carb
+ — 
+4/28/26, 3:47 PM
+primero es coge llave y que tiene llave si toca puerta opened es true
+Carlos M [toki], 
+ — 
+4/28/26, 3:47 PM
+osea, la animación pasa después de que opened sea true, no antes
+Jessica Carb
+ — 
+4/28/26, 3:48 PM
+si el opened es true cuando el que tiene la llave toca la puerta
+BepBop
+ — 
+4/28/26, 3:50 PM
+si, en si cuadno recibes el true, pones a funcionar la aiamciond e abrir puerta una vez
+pero ahsta entonces, se queda en la primera imagen del sprte
+Jessica Carb
+ — 
+4/28/26, 5:15 PM
+PLAYER_EXITED
+{
+  "type": "PLAYER_EXITED",
+  "data": {
+    "playerId": "abc123",
+
+  }
+}
+final se queda asi esto es que el jugador ha cruzado la puerta
+Jessica Carb
+ — 
+4/28/26, 6:50 PM
+agregue otro que es por si el portador de la llave se desconecta avise que la llave vuelva a su sitio {
+  "type": "KEY_RESET",
+  "data": {}
+}
+BepBop
+ — 
+5/1/26, 10:04 PM
+@everyone
+tengo el nuevo mapa
+
+{
+  "name": "ietiPico",
+  "description": "",
+  "levels": [
+    {
+      "name": "level0",
+
+game_data.json
+10 KB
+
+{
+  "zoneGroups": [
+    {
+      "id": "__main__",
+      "name": "Main",
+      "collapsed": false
+
+level_000_zones.json
+2 KB
+
+{
+  "zoneGroups": [
+    {
+      "id": "__main__",
+      "name": "Main",
+      "collapsed": false
+
+level_001_zones.json
+3 KB
+
+{
+  "tileMap": [
+    [32, 33, 34, 35, 203, 204, 205, 205, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 203, 204, 31, 32, 33],
+    [32, 33, 34, 35, 203, 204, 205, 205, 205, 205, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 203, 203, 203, 204, 31, 32, 33],
+    [32, 33, 34, 35, 203, 204, 205, 220, 220, 220, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 218, 218, 203, 204, 31, 32, 33],
+    [32, 33, 34, 35, 203, 204, 205, 220, 220, 220, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 233, 233, 203, 204, 31, 32, 33],
+
+level_000_layer_000.json
+7 KB
+
+{
+  "tileMap": [
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+
+level_000_layer_001.json
+7 KB
+
+{
+  "tileMap": [
+    [34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 31, 32],
+    [34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 31, 32],
+    [34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 31, 32],
+    [34, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 31, 32],
+
+level_001_layer_000.json
+12 KB
+
+{
+  "pathGroups": [
+    {
+      "id": "__main__",
+      "name": "Main",
+      "collapsed": false
+
+level_000_paths.json
+1 KB
+
+{
+  "pathGroups": [
+    {
+      "id": "__main__",
+      "name": "Main",
+      "collapsed": false
+
+level_001_paths.json
+1 KB
+este es el asset de la palanca, he pillado la animacion de este, donde uno est aabiert ay otra cerrada
+Image
+
+{
+  "animationGroups": [
+    {
+      "id": "__main__",
+      "name": "Main",
+      "collapsed": false
+
+animations.json
+37 KB
+y este e de animations
+igualmente todo est en el git d web, la rama de pro
+Jessica Carb
+ — 
+Yesterday at 3:47 PM
+👍
+Esta tarde me lo miro y me pongo con el servidor
+BepBop
+ — 
+Yesterday at 3:48 PM
+va, cuando lo tengas avisa y adapto al cliente
+haré lod e losvideos
+Jessica Carb
+ — 
+Yesterday at 4:14 PM
+Me parece bien
+﻿
+
 {
   "name": "ietiPico",
   "description": "",
@@ -107,6 +365,114 @@
       "depthSensitivity": 0.08,
       "zonesFile": "zones/level_000_zones.json",
       "pathsFile": "paths/level_000_paths.json"
+    },
+    {
+      "name": "level2",
+      "description": "",
+      "gameplayData": "",
+      "layers": [
+        {
+          "name": "suelo",
+          "gameplayData": "",
+          "x": 0,
+          "y": 0,
+          "depth": 0.0,
+          "tilesSheetFile": "media/TileSetMap_Png.png",
+          "tilesWidth": 16,
+          "tilesHeight": 16,
+          "visible": true,
+          "groupId": "__main__",
+          "tileMapFile": "tilemaps/level_001_layer_000.json"
+        }
+      ],
+      "layerGroups": [
+        {
+          "id": "__main__",
+          "name": "Main",
+          "collapsed": false
+        }
+      ],
+      "sprites": [
+        {
+          "name": "skeleton1",
+          "gameplayData": "",
+          "type": "skeleton1",
+          "animationId": "anim_1776697186675083",
+          "x": 121,
+          "y": 339,
+          "width": 112,
+          "height": 186,
+          "imageFile": "media/skeleton_color1.png",
+          "flipX": false,
+          "flipY": false,
+          "depth": 0.0,
+          "groupId": "__main__"
+        },
+        {
+          "name": "door",
+          "gameplayData": "",
+          "type": "door",
+          "animationId": "anim_1776701483295954",
+          "x": 1276,
+          "y": 208,
+          "width": 266,
+          "height": 310,
+          "imageFile": "media/door.png",
+          "flipX": false,
+          "flipY": false,
+          "depth": 0.0,
+          "groupId": "__main__"
+        },
+        {
+          "name": "key",
+          "gameplayData": "",
+          "type": "key",
+          "animationId": "anim_1777305199392731",
+          "x": 1079,
+          "y": 141,
+          "width": 32,
+          "height": 32,
+          "imageFile": "media/skeleton_key.png",
+          "flipX": false,
+          "flipY": false,
+          "depth": 0.0,
+          "groupId": "__main__"
+        },
+        {
+          "name": "palanca",
+          "gameplayData": "",
+          "type": "palanca",
+          "animationId": "anim_1777665588350292",
+          "x": 991,
+          "y": 361,
+          "width": 32,
+          "height": 32,
+          "imageFile": "media/assets_dungeon.png",
+          "flipX": false,
+          "flipY": false,
+          "depth": 0.0,
+          "groupId": "__main__"
+        }
+      ],
+      "spriteGroups": [
+        {
+          "id": "__main__",
+          "name": "Main",
+          "collapsed": false
+        }
+      ],
+      "groupId": "__main__",
+      "viewportWidth": 320,
+      "viewportHeight": 180,
+      "viewportX": 0,
+      "viewportY": 0,
+      "viewportAdaptation": "letterbox",
+      "viewportInitialColor": "green",
+      "viewportPreviewColor": "blue",
+      "backgroundColorHex": "#E1E1DC",
+      "depthSensitivity": 0.08,
+      "zonesFile": "zones/level_001_zones.json",
+      "pathsFile": "paths/level_001_paths.json"
     }
   ],
   "levelGroups": [
@@ -233,6 +599,15 @@
       "tileHeight": 186,
       "selectionColorHex": "#FFCC00",
       "groupId": "__main__"
+    },
+    {
+      "name": "assets_dungeon",
+      "fileName": "media/assets_dungeon.png",
+      "mediaType": "spritesheet",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "selectionColorHex": "#FFCC00",
+      "groupId": "__main__"
     }
   ],
   "mediaGroups": [
@@ -258,6 +633,14 @@
     {
       "name": "exitdoor",
       "color": "green"
+    },
+    {
+      "name": "precipicio",
+      "color": "pink"
+    },
+    {
+      "name": "palanca",
+      "color": "indigo"
     }
   ],
   "animationsFile": "animations/animations.json"
