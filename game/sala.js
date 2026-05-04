@@ -38,7 +38,17 @@ class Sala {
         //asigno color
         const color = this.availableColors.shift();
         const spawn = this.world.spawns[this.players.size % this.world.spawns.length];
+        let groundY = this.world.height;
+        for (const obs of this.world.obstacles) {
+            if (spawn.x >= obs.x && spawn.x <= obs.x + obs.width) {
+                if (obs.y < groundY) {
+                    groundY = obs.y;
+                }
+            }
+        }
 
+        // colocar jugador encima del suelo
+        const spawnY = groundY - 90; // 90 = altura jugador
         console.log(`[SPAWN] Asignando posición: x=${spawn?.x}, y=${spawn?.y}`);
         // 1. Definim els punts de sortida
        /* const spawnPoints = [
