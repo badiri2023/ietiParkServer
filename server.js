@@ -84,12 +84,12 @@ wss.on('connection', (ws) => {
             if (Jugadors) {
                 try {
                     await Jugadors.updateOne(
-                        { nickname: msg.nickname }, // Buscamos por nombre para no duplicar
+                        { nickname: msg.nickname }, 
                         {
                             $set: { 
-                                _id: myId,            // Actualizamos el ID actual
-                                color: playerActual.color, // Guardamos su color asignado
-                                lastLogin: new Date()
+                                _id: myId,    
+                                   
+                                color: playerActual.color
                             }
                         },
                         { upsert: true } // Si no existe, lo crea. Si existe, lo actualiza.
