@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const {MongoClient} = require('mongodb');
 const Sala = require('./game/sala');
-
+let partidaNumero = 0;
 
 ///---------------config Mongo
 //const uri = 'mongodb://root:password@localhost:27017/';
@@ -88,7 +88,7 @@ wss.on('connection', (ws) => {
                         {
                             $set: { 
                                 _id: myId,    
-                                   
+
                                 color: playerActual.color
                             }
                         },
@@ -145,29 +145,7 @@ wss.on('connection', (ws) => {
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
-            console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
-             if (partidaActual) {
-                const actions = [];
-
-                if (msg.left) actions.push("LEFT");
-                if (msg.right) actions.push("RIGHT");
-                if (msg.jump) actions.push("JUMP");
-                 if (actions.length === 0) return; //no guardamos nada si no hay accion
-
-                await Partides.updateOne(
-                    { _id: partidaActual._id },
-                    {
-                        $push: {
-                            actions: {
-                                playerID: myId,
-                                //playerNick: nickname,
-                                actions, 
-                                timestamp: new Date()
-                            }
-                        }
-                    }
-                );
-            }
+           // console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
         }
     });
     //*******desconexión
