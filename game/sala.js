@@ -10,7 +10,7 @@ class Sala {
         this.minPlayers = 2;
         this.maxPlayers = 8;
         this.world = new World();
-        this.gameStarted = false; //true para pruebas de un solo jugador el definitivo es false
+        this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
         this.levelCompleted = false;
@@ -87,7 +87,9 @@ class Sala {
             }));
         } else {
             //
-            ws.send(JSON.stringify({ type: "WAITING", message: "Esperando jugadores..." }));
+            ws.send(JSON.stringify({ 
+                type: "WAITING", 
+                message: "Esperando jugadores..." }));
         }
 
         return { success: true, player };
@@ -188,7 +190,8 @@ class Sala {
             obstacles: this.world.obstacles,
             layers : this.world.layers,
             door: this.world.door,
-            key: this.world.key
+            key: this.world.key,
+            palanca: this.world.palanca
         };
     }
     //estado del juego
@@ -209,17 +212,13 @@ class Sala {
                 y: holder ? holder.y + 50 : this.world.key.y, 
                 collected: this.world.key.collected,
                 holderId: this.world.key.holderId
-                        },
-            /*door: {
-                x: this.world.door.x,
-                y: this.world.door.y,
+            },
+
+            door: this.world?.door ? {
+            x: this.world.door.x,
+            y: this.world.door.y,
             opened: this.world.door.opened
-        }*/
-        door: this.world?.door ? {
-        x: this.world.door.x,
-        y: this.world.door.y,
-        opened: this.world.door.opened
-    } : null
+            } : null
         };
     }
     //flutter 
@@ -244,6 +243,8 @@ class Sala {
         this.viewers.delete(ws);
         console.log("Observador desconectado");
     }
+
+    //****Key******** */
     // gestion llave quien la tiene 
     checkKeyCollision(p) {
         if (this.world.key.collected) return;
@@ -262,10 +263,8 @@ class Sala {
 
 
     // ****GAME LOOP
-  
-    
     update() {
-        // Lógica de inicio de partida
+        //Inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
             console.log("¡Partida iniciada!");
@@ -279,33 +278,38 @@ class Sala {
         if (!this.gameStarted) return;
         //array jugadores para este frame
         const playersList = Array.from(this.players.values());
- 
+        //actualizacion player
         for (const p of this.players.values()) {
             const prevX = p.x;
             const prevY = p.y;
 
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
-            // Colisión con obstáculos
-            for (const obs of this.world.obstacles) {
-                if (this.isColliding(p, obs)) {
-                    p.x = prevX;
-                    p.y = prevY;
-             
-                }
+              // ********reinicio caida, sicae vuelve al inicio *****
+            if (p.y > this.world.height) {
+                const spawn = this.world.spawns[
+                    Math.floor(Math.random() * this.world.spawns.length)
+                ];
+
+                p.x = spawn.x;
+                p.y = spawn.y;
+                p.vx = 0;
+                p.vy = 0;
             }
 
-            // LLAVE
+           
+
+            // *****Key******
             this.checkKeyCollision(p);
             // si la puerta aún está cerrada
-            //if (!this.world.door.opened && this.isColliding(p, this.world.door)) {
+
+            //*****Puerta
             if (this.world?.door && !this.world.door.opened && this.isColliding(p, this.world.door)) {
                 const hasKey = this.world.key.holderId === p.id;
                 
                 if (!hasKey) {
-                    //10 si no tiene llave el jugador rebota contra la puerta
+                    //si no tiene llave el jugador rebota contra la puerta
                     p.x = prevX;
-                    //p.y = prevY;resetera soo la x para que le jugador no se pegue a la puerta y pueda bajar
                     p.vx = 0;
                     console.log(`${p.nickname} no puedes pasar, no tienes la llave`);
                 } else {
@@ -317,8 +321,8 @@ class Sala {
                     });
                 }
             }
-            //detectar que cruzan la puerta
-            //if (this.world.door.opened && this.isColliding(p, this.world.door)) {
+            //detectar  quien cruza la puerta
+       
             if (this.world?.door?.opened && this.isColliding(p, this.world.door)) {
                 if (!p.finished) {
                     p.finished = true;
@@ -330,19 +334,24 @@ class Sala {
                     });
                 }
             }
+           
+             // Colisión con obstáculos
+            for (const obs of this.world.obstacles) {
+                if (this.isColliding(p, obs)) {
+                    p.x = prevX;
+                    p.y = prevY;
+             
+                }
+            }
             
-            
+             /***coliosiones player */
 
-            // Colisión con otros jugadores (AHORA ESTÁ DENTRO DEL BUCLE)
+            // Colisión con otros jugadores
             for (const other of this.players.values()) {
                 if (p.id === other.id) continue; // No chocamos contra nosotros mismos
 
                 if (this.isPlayerColliding(p, other)) {
-                    // Lógica de apilamiento:
-                    // 1. ¿El jugador se está moviendo hacia abajo (cayendo)?
-                    // 2. ¿Su pie está por encima de la mitad del otro jugador?
                     if (p.vy > 0 && p.y + p.height < other.y + other.height / 2) {
-                        // "Aterrizamos" al jugador encima del otro
                         p.y = other.y - p.height;
                         p.vy = 0;
                         p.onGround = true; // Permite saltar desde la cabeza de otro
@@ -353,20 +362,47 @@ class Sala {
                 }
             }
         }
+        //*****Nivel completado
         const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
-
+        //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
             this.levelCompleted = true;
-            console.log("Nivel completado con éxito");
-            this.broadcast("LEVEL_COMPLETED", {});
-            return;
+            console.log("Cambiando a nivel 2...");
+            const moved = this.world.nextLevel();
+
+            if(!moved){
+                console.log("terminado")
+                return;
+            }
+            
+            // reseteo jugadores
+            const playersUpdate = [];
+            let i = 0;
+            for (const p of this.players.values()) {
+                const spawn = this.world.spawns[i % this.world.spawns.length];
+                p.x = spawn.x;
+                p.y = spawn.y;
+                p.vx = 0;
+                p.vy = 0;
+                p.finished = false;
+
+                playerUpdates.push({ id: p.id, x: p.x, y: p.y });
+                i++;
+            }
+
+            this.broadcast("CHANGE_LEVEL", {
+                world: this.world.getWorldData(),
+                players: playerUpdates
+                });
+
+            this.levelCompleted = false;
+            //const state = this.getState();
+            //console.log("DEBUG SERVER:", JSON.stringify(state));
+            //console.log("WORLD:", this.world.width, this.world.height);
+            //console.log("DOOR:", this.world.door.x,this.world.door.y);
+            //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
+            this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
         }
-        const state = this.getState();
-        //console.log("DEBUG SERVER:", JSON.stringify(state));
-        //console.log("WORLD:", this.world.width, this.world.height);
-        //console.log("DOOR:", this.world.door.x,this.world.door.y);
-        //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
-        this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     
 }

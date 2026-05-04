@@ -5,7 +5,7 @@ class World {
         this.loadLevel(levelIndex);
     }
     loadLevel(index) {
-        const level = levelData.levels[index];
+        const levelZones = levelData.levels[index].zones || [];
         if (!level) {
             console.error("Nivel no existe:", index);
             return;
