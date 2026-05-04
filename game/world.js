@@ -5,17 +5,17 @@ class World {
         this.loadLevel(levelIndex);
     }
     loadLevel(index) {
-        const levelZones = levelData.levels[index].zones || [];
-        if (!levelZones) {
+        const level = levelData.levels[index].zones || [];
+        if (!level) {
             console.error("Nivel no existe:", index);
             return;
         }
 
 
-        this.currentLevel = levelZones;
-        this.sprites = levelZones.sprites || [];
-        this.layers = levelZones.layers || [];
-        this.zones = levelZones.zones || [];
+        this.currentLevel = level;
+        this.sprites = level.sprites || [];
+        this.layers = level.layers || [];
+        this.zones = level.zones || [];
 
         ///#####hablar con Bad para medidas del mundo por que el nivel 2 es mas grande
         //tamaño mundo lo ajuste por que el viewport es muy pequeño 
