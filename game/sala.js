@@ -39,7 +39,7 @@ class Sala {
         const color = this.availableColors.shift();
         const spawn = this.world.spawns[this.players.size % this.world.spawns.length];
 
-        
+        const prueba= 0;
      
 
         // 1. Definim els punts de sortida
