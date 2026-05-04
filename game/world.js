@@ -22,11 +22,8 @@ class World {
         //this.width = level.viewportWidth;
         //this.height = level.viewportHeight;
      
-        console.log("LEVELLLLL:", level);
+        //onsole.log("LEVELLLLL:", level);
         // reset total por nivel
-       
-
-        // tamaño mundo
         this.width =  1500;
         this.height =  600;
 
