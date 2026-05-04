@@ -10,6 +10,8 @@ class World {
             console.error("Nivel no existe:", index);
             return;
         }
+         // reset total por nivel
+        this.resetLevelState();
 
 
         this.currentLevel = level;
@@ -24,8 +26,7 @@ class World {
        //this.width = 1500;
         //this.height = 600;
             //console.log("LEVEL:", level);
-        // reset total por nivel
-        this.resetLevelState();
+       
 
         // tamaño mundo
         this.width = level.viewportWidth || 1500;
@@ -33,7 +34,7 @@ class World {
 
 
         //-----Puerta-------
-        const doorSprite = level.sprites.find(s => s.type === "door");
+        const doorSprite = this.sprites.find(s => s.type === "door");
         this.door = doorSprite ? {
             x: doorSprite.x,
             y: doorSprite.y,
@@ -43,7 +44,7 @@ class World {
         } : null;
 
         ///------spawns------
-        this.spawns = level.sprites
+        this.spawns = this.sprites
             .filter(s => s.type === "player1"|| s.type === "skeleton1")
             .map(s => ({
                 x: s.x,
@@ -51,7 +52,7 @@ class World {
             }));
 
         //-----key-----
-        const keySprite = level.sprites.find(s => s.type === "key");
+        const keySprite = this.sprites.find(s => s.type === "key");
         this.key = {
             x: keySprite ? keySprite.x : 200,
             y:  keySprite ? (keySprite.y - 50) : 50,
