@@ -79,7 +79,11 @@ class Sala {
        // console.log(`WORLD: ${this.world.width}x${this.world.height}`);
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
-            console.log(`[WORLD_INIT] Enviando datos del mundo a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
+            const worldInitData = this.getWorldData(); 
+
+    // 2. DESPUÉS haces el log
+    console.log(`[WORLD_INIT] Enviando datos a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
+            
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
                 data: this.getWorldData() // Usamos el método que separamos antes
