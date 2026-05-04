@@ -24,7 +24,7 @@ class World {
         //this.height = level.viewportHeight;
         this.width = 1500;
         this.height = 600;
-            //console.log("LEVEL:", level);
+        console.log("LEVEL:", level);
      
         
 
