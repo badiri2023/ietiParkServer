@@ -15,7 +15,8 @@ let Partides;
 let Records;
 
 ///--------------estado servidor
-const sala = new Sala();
+//const sala = new Sala();
+const sala = new Sala(Partides);
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 console.log("Servidor en ws://0.0.0.0:3000");
