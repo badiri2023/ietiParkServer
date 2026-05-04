@@ -110,7 +110,7 @@ class Sala {
         if (!this.partidaId) {
             this.partidaId = `partida_${Date.now()}`;
 
-            await Partides.insertOne({
+            await this.Partides.insertOne({
                 _id: this.partidaId,
                 fecha: new Date(),
                 players: []
@@ -450,9 +450,9 @@ class Sala {
         }
         async saveKeyTaken(player) {
         try {
-            if (!Partides || !this.partidaId) return;
+            if (!this.Partides || !this.partidaId) return;
 
-            await Partides.updateOne(
+            await this.Partides.updateOne(
                 { _id: this.partidaId },
                 {
                     $set: {
