@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const Player = require('./players');
 const World = require('./world');
 const COLORS = require('./colors');
+let Partides;
 
 
 class Sala {
@@ -15,8 +16,10 @@ class Sala {
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
         this.levelCompleted = false;
         this.availableColors = [...COLORS];
-
-        this.keyTakenInfo = null; 
+        this.keyTakenInfo = null;
+    
+        this.partidaId = null;
+        this.Partides = partidesCollection;
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
     }
@@ -24,7 +27,7 @@ class Sala {
     
     //******* JUGADORES********
    
-    addPlayer(id, nickname, ws) {
+    async addPlayer(id, nickname, ws) {
         
         const nameTaken = Array.from(this.players.values()).some(p => p.nickname === nickname);
         if (nameTaken) {
@@ -51,7 +54,7 @@ class Sala {
 
         // colocar jugador encima del suelo
         const spawnY = groundY - 90; // 90 = altura jugador
-        console.log(`[SPAWN] Asignando posición: x=${spawn?.x}, y=${spawn?.y}`);
+        //console.log(`[SPAWN] Asignando posición: x=${spawn?.x}, y=${spawn?.y}`);
         // 1. Definim els punts de sortida
        /* const spawnPoints = [
              { x: 70, y: 500 },
@@ -93,8 +96,8 @@ class Sala {
         if (this.gameStarted) {
             const worldInitData = this.getWorldData(); 
 
-    // 2. DESPUÉS haces el log
-    console.log(`[WORLD_INIT] Enviando datos a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
+        // 2. DESPUÉS haces el log
+        console.log(`[WORLD_INIT] Enviando datos a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
             
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
@@ -106,6 +109,27 @@ class Sala {
                 type: "WAITING", 
                 message: "Esperando jugadores..." }));
         }
+        if (!this.partidaId) {
+            this.partidaId = `partida_${Date.now()}`;
+
+            await Partides.insertOne({
+                _id: this.partidaId,
+                fecha: new Date(),
+                players: []
+            });
+        }
+        await Partides.updateOne(
+            { _id: this.partidaId },
+            {
+                $push: {
+                    players: {
+                        id: id,
+                        nickname: nickname,
+                        tookKey: false
+                    }
+                }
+            }
+        );
 
         return { success: true, player };
     }
@@ -274,7 +298,7 @@ class Sala {
             };
 
             console.log(`${p.nickname} tiene la llave`);
-            this.saveKeyTaken(p);
+
 
             this.broadcast("KEY_COLLECTED", {
                 playerId: p.id
@@ -395,16 +419,10 @@ class Sala {
                 console.log("terminado")
                 return;
             }
-            await Partides.insertOne({
-                partidaNumero: partidaNumero,
-                fecha: new Date(),
-                keyTaken: this.world.key.holderId !== null,
-                keyHolderId: this.world.key.holderId,
-                keyHolderNick: this.keyTakenInfo?.nickname || null
-            });
+            
             
             // reseteo jugadores
-            const playerUpdate = [];
+            const playerUpdates = [];
             let i = 0;
             for (const p of this.players.values()) {
                 const spawn = this.world.spawns[i % this.world.spawns.length];
@@ -431,27 +449,28 @@ class Sala {
             //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
             this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
         }
-    }
-    async saveKeyTaken(player) {
-    try {
-        await Partides.updateOne(
-            { _id: partidaActual._id },
-            {
-                $set: {
-                    keyTaken: true,
-                    keyHolderId: player.id,
-                    keyHolderNick: player.nickname,
-                    keyTakenAt: new Date()
-                }
-            },
-            { upsert: true }
-        );
+        }
+        async saveKeyTaken(player) {
+        try {
+            if (!Partides || !this.partidaId) return;
 
-        console.log("Llave guardada en Mongo");
-    } catch (err) {
-        console.error("Error guardando llave:", err);
+            await Partides.updateOne(
+                { _id: this.partidaId },
+                {
+                    $set: {
+                        keyTaken: true,
+                        keyHolderId: player.id,
+                        keyHolderNick: player.nickname,
+                        keyTakenAt: new Date()
+                    }
+                },
+                { upsert: true }
+            );
+
+        } catch (err) {
+            console.error("Error guardando key en Mongo:", err);
+        }
     }
-}
     
 }
 
