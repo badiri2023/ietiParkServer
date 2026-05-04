@@ -7,7 +7,7 @@ class Player {
 
         // POSICIÓN: Viene de los cálculos de tu Sala
         this.x = 0;
-        this.y = ;
+        this.y =0 ;
         // hitbox de los jugadores
         this.width = 30;
         this.height = 90;
