@@ -88,7 +88,6 @@ wss.on('connection', (ws) => {
                 {_id: myId},
                 {
                     $setOnInsert: {
-                        
                         nickname: msg.nickname,
 
                         descp:{
@@ -96,7 +95,6 @@ wss.on('connection', (ws) => {
                             color: sala.players.color
 
                         },
-                       
                         /*createdAt: new Date(),
                         stats: {
                             partidas: 0,
@@ -116,8 +114,6 @@ wss.on('connection', (ws) => {
 
                 await Partides.insertOne(partidaActual);
             }
-
-
             // añadir jugador a partida
             await Partides.updateOne(
                 { _id: partidaActual._id },
@@ -155,7 +151,7 @@ wss.on('connection', (ws) => {
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
-            //console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
+            console.log(`[INPUT] Jugador ${player.nickname} -> Izquierda: ${msg.left} | Derecha: ${msg.right} | Salto: ${msg.jump}`);
              if (partidaActual) {
                 const actions = [];
 

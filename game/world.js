@@ -35,7 +35,7 @@ class World {
         const doorSprite = level.sprites.find(s => s.type === "door");
         this.door = doorSprite ? {
             x: doorSprite.x,
-            y: 50,
+            y: doorSprite.y,
             width: doorSprite.width,
             height: doorSprite.height,
             opened: false
