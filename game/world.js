@@ -37,7 +37,8 @@ class World {
         const doorSprite = this.sprites.find(s => s.type === "door");
         this.door = doorSprite ? {
             x: doorSprite.x,
-            y: doorSprite.y,
+           // y: doorSprite.y,
+           y:0,
             width: doorSprite.width,
             height: doorSprite.height,
             opened: false
