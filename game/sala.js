@@ -78,7 +78,6 @@ class Sala {
 
             await this.Partides.insertOne({
                 _id: this.partidaId,
-                createdAt: new Date(),
                 players: []
             });
             //console.log("Partida creada:", this.partidaId);
@@ -91,7 +90,6 @@ class Sala {
                         id,
                         nickname,
                         hasKey: false,
-                        exitAt: null
                     }
                 }
             }
