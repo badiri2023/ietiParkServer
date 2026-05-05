@@ -425,7 +425,7 @@ class Sala {
                     });
                     this.savePlayerExit(p);
 
-                    if (this.world.currentLevelIndex === 1) {
+                    if (this.world.levelIndex === 1) {
                         console.log("**** FIN DIRECTO ****");
 
                         this.broadcast("GAME_OVER", {
