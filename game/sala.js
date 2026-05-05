@@ -304,22 +304,19 @@ class Sala {
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
             //-----------------precipicio
             for (const h of this.world.hazards) {
-            if (this.isColliding(p, h)) {
+                if (this.isColliding(p, h) && !p.falling) {
 
-                console.log(` ${p.nickname} cayó al precipicio`);
+                    console.log(`💀 ${p.nickname} cayó al precipicio`);
 
-                const spawn = this.world.spawns[0] || { x: 100, y: 100 };
+                    // activar estado de caída
+                    p.falling = true;
+                    p.fallTimer = 15; // frames (~0.5s a 30fps)
 
-                p.x = spawn.x;
-                p.y = spawn.y;
-
-                p.vx = 0;
-                p.vy = 0;
-
-                    break;
+                    // congelar movimiento
+                    p.vx = 0;
+                    p.vy = 0;
                 }
-            }  
-
+            }
             // *****Key******
             this.checkKeyCollision(p);
 

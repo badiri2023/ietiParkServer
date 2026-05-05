@@ -21,6 +21,8 @@ class Player {
         this.finished = false;
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
+        this.falling = false;
+        this.fallTimer = 0;
     }
 
     // colisión AABB
