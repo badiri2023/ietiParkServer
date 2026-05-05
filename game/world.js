@@ -26,8 +26,11 @@ class World {
 
         this.currentLevel = level;
         this.sprites = level.sprites || [];
-        this.width = level.viewportWidth || 1500;
-        this.height = level.viewportHeight || 800;
+        this.layers = level.layers || [];
+        //this.width = level.viewportWidth || 1500;
+        //this.height = level.viewportHeight || 800;
+        this.width = 1000;
+        this.height = 600;
 
         // Cargar Física desde el archivo de Zonas (La clave del éxito)
         this.obstacles = [];
@@ -67,12 +70,11 @@ class World {
         } : null;
 
         ///------spawns------
+        if (this.spawns.length === 0) {
         this.spawns = level.sprites
-            .filter(s => s.type === "player1"|| s.type === "skeleton1")
-            .map(s => ({
-                x: s.x,
-                y: s.y
-            }));
+            .filter(s => s.type === "player1" || s.type === "skeleton1")
+            .map(s => ({ x: s.x, y: s.y }));
+        }
 
         //-----key-----
         const keySprite = level.sprites.find(s => s.type === "key");
@@ -101,6 +103,12 @@ class World {
 
     resetLevelState() {
         this.loadLevel(this.levelIndex);
+        /*if (this.door) this.door.opened = false;
+
+        if (this.key) {
+            this.key.collected = false;
+            this.key.holderId = null;
+        }*/ 
     }
 
     nextLevel() {
