@@ -416,17 +416,12 @@ class Sala {
            
              // Colisión con obstáculos
             for (const obs of this.world.obstacles) {
-                if (p.vy >= 0 && (prevY + p.height) <= (obs.y + 10)) {
-                    p.y = obs.y - p.height;
-                    p.vy = 0;
-                    p.onGround = true;
-                } else {
-                    // Choque lateral o cabeza
+                if (this.isColliding(p, obs)) {
                     p.x = prevX;
-                    if (p.vy < 0) p.vy = 0; // Si choca el techo, deja de subir
+                    p.y = prevY;
+             
                 }
             }
-        
 
             // Colisión con otros jugadores
             for (const other of this.players.values()) {
