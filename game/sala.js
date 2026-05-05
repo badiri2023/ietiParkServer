@@ -8,12 +8,16 @@ class Sala {
         this.players = new Map();
         this.minPlayers = 2;
         this.maxPlayers = 8;
+
         this.world = new World();
+        
         this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
+        
         this.levelCompleted = false;
         this.availableColors = [...COLORS];
+       
         this.keyTakenInfo = null;
     
         this.partidaId = null;
@@ -96,11 +100,11 @@ class Sala {
     async registrarEnBD(id, nickname) {
         if (!this.partidaId) {
             this.partidaId = `partida_${Date.now()}`;
-            await this.Partides.insertOne({ _id: this.partidaId, fecha: new Date(), players: [] });
+            await this.Partides.insertOne({ _id: this.partidaId, players: [] });
         }
         await this.Partides.updateOne(
             { _id: this.partidaId },
-            { $push: { players: { id, nickname, tookKey: false } } }
+            { $push: { players: { id, nickname, hasKey: false } } }
         );
     }
 
@@ -130,6 +134,31 @@ class Sala {
         this.broadcast("PLAYER_LIST", this.getPlayerList());
 
         console.log(`Jugador ${nickname} desconectado`);
+    }
+    resetPlayers() {
+        let i = 0;
+
+        for (const p of this.players.values()) {
+            const spawn = this.world.spawns[i % this.world.spawns.length];
+
+            p.x = spawn.x;
+            p.y = spawn.y;
+            p.vx = 0;
+            p.vy = 0;
+            p.finished = false;
+            p.onGround = false;
+
+            i++;
+        }
+
+        // reset llave
+        this.world.key.collected = false;
+        this.world.key.holderId = null;
+
+        // reset puerta
+        if (this.world.door) {
+            this.world.door.opened = false;
+        }
     }
 
     getPlayer(id) {
@@ -289,7 +318,7 @@ class Sala {
         const playersList = Array.from(this.players.values());
         //actualizacion player
         for (const p of this.players.values()) {
-            console.log(`[PLAYER>>>] ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
+            //console.log(`[PLAYER>>>] ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
             const prevX = p.x;
             const prevY = p.y;
 
@@ -388,38 +417,15 @@ class Sala {
                 console.log("terminado")
                 return;
             }
-            
-            
-            // reseteo jugadores
-            const playerUpdates = [];
-            let i = 0;
-            for (const p of this.players.values()) {
-                const spawn = this.world.spawns[i % this.world.spawns.length];
-                p.x = spawn.x;
-                p.y = spawn.y;
-                p.vx = 0;
-                p.vy = 0;
-                p.finished = false;
-            
-                playerUpdates.push({ id: p.id, x: p.x, y: p.y });
-                i++;
-            }
+            this.resetPlayers();
+            this.world.resetLevelState?.();
+
 
            this.broadcast("CHANGE_LEVEL", {
             world: this.getWorldData(),
-            players: Array.from(this.players.values()).map(p => ({
-                id: p.id,
-                x: p.x,
-                y: p.y,
-                vx: 0,
-                vy: 0,
-                    finished: false
-                }))
+            players: this.getState().players
             });
-            setTimeout(() => {
             this.levelCompleted = false;
-            this.broadcast("STATE_UPDATE", this.getState());
-            }, 50);
 
             return;
 
