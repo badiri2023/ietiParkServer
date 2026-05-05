@@ -425,7 +425,7 @@ class Sala {
                     });
                     this.savePlayerExit(p);
                 }
-                console.log("allFinished:", allFinished);
+                
                 console.log("palanca:", this.world.palanca?.activated);
                 console.log("this.palanca:", this.palanca);
             }
@@ -461,6 +461,7 @@ class Sala {
         }
         //*****Nivel completado
         const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
+        console.log("allFinished:", allFinished);
         //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
             if (this.world.palanca?.activated) {

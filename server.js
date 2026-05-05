@@ -98,8 +98,7 @@ wss.on('connection', (ws) => {
                         { nickname: msg.nickname }, 
                         {
                             $set: { 
-                                _id: myId,    
-
+                                playerId: myId,   
                                 color: playerActual.color
                             }
                         },
