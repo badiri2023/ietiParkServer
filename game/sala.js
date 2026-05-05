@@ -424,6 +424,18 @@ class Sala {
                         playerId: p.id
                     });
                     this.savePlayerExit(p);
+
+                    if (this.world.currentLevelIndex === 1) {
+                        console.log("**** FIN DIRECTO ****");
+
+                        this.broadcast("GAME_OVER", {
+                            type: "FIN",
+                            message: "¡HAS GANADO!"
+                        });
+
+                        this.levelCompleted = true;
+                        return;
+                    }
                 }
               
             }
@@ -461,14 +473,6 @@ class Sala {
         const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
         //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
-            this.levelCompleted = true;
-            if (this.world.currentLevelIndex === 1) {
-             // Marcamos para no entrar más aquí
-            console.log("**** PARTIDA FINALIZADA ****");
-            this.broadcast("GAME_OVER", { type: "FIN", message: "¡VICTORIA TOTAL!" });
-            return; 
-            }
-
 
             this.levelCompleted = true;
             console.log("Cambiando a nivel 2...");
