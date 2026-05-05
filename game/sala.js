@@ -442,6 +442,7 @@ class Sala {
              // Colisión con obstáculos
             for (const obs of this.world.obstacles) {
                 if (this.isColliding(p, obs)) {
+                    console.log(`[FÍSICA] Bloqueado por: ${obs.name} (Tipo: ${obs.type})`);
                     p.x = prevX;
                     p.y = prevY;
              
@@ -557,7 +558,7 @@ class Sala {
         }
     }
 
-    /*async savePalancaActivated(player) {
+    async savePalancaActivated(player) {
         try {
             if (!this.Partides || !this.partidaId) return;
 
@@ -578,7 +579,7 @@ class Sala {
         } catch (err) {
             console.error("Error al guardar activación de palanca en Mongo:", err);
         }
-    }*/
+    }
     resetPlayerToSpawn(p) {
         const spawn = this.world.spawns[0] || { x: 100, y: 100 };
         p.x = spawn.x;
