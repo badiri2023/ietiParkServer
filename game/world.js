@@ -57,7 +57,15 @@ class World {
                         break;
 
                     case "plataforma":
-                        this.platforms.push(z);
+                        const nuevaPlataforma = {
+                            x: z.x,
+                            y: z.y,
+                            width: z.width,
+                            height: z.height,
+                            type: "plataforma"
+                        };
+                        this.platforms.push(nuevaPlataforma);
+                        this.obstacles.push(nuevaPlataforma); 
                         break;
 
                     case "precipicio":
@@ -98,6 +106,7 @@ class World {
                             activated: false
                         };
                         break;
+
                     case "plataformaactivable":
                         this.plataformaActivable = {
                             x: z.x,
