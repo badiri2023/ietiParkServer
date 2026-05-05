@@ -198,10 +198,11 @@ class World {
     nextLevel() {
         const nextIndex = this.levelIndex + 1;
         if (nextIndex < levelData.levels.length) {
+            this.levelIndex = nextIndex;
             this.loadLevel(nextIndex);
             return true;
         }
-        console.log("[WORLD] ¡Fin del juego! No hay más niveles.");
+        console.log(" ¡Fin del juego! No hay más niveles.");
         return false;
     }
 
