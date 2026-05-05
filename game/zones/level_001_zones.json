@@ -97,7 +97,7 @@
     },
     {
       "name": "palanca",
-      "type": "Default",
+      "type": "palanca",
       "gameplayData": "",
       "x": 981,
       "y": 340,

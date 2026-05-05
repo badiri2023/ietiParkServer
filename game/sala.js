@@ -209,9 +209,9 @@ class Sala {
             plataformaActivable: this.world.plataformaActivable
         };
         console.log("[DEBUG SALA] Enviando WORLD_DATA. ¿Tiene palanca?:", data.palanca ? "SÍ" : "NO");
-    if(data.palanca) console.log("Coordenadas palanca:", data.palanca.x, data.palanca.y);
+        if(data.palanca) console.log("Coordenadas palanca:", data.palanca.x, data.palanca.y);
     
-    return data;
+        return data;
     }
     //estado del juego
     getState() {
