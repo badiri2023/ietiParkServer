@@ -486,6 +486,15 @@ class Sala {
         const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
         //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
+            if (this.world.currentLevelIndex === 1) {
+            this.levelCompleted = true; // Marcamos para no entrar más aquí
+            console.log("**** PARTIDA FINALIZADA ****");
+            // Opcional: un broadcast final de seguridad
+            this.broadcast("GAME_OVER", { type: "FIN", message: "¡VICTORIA TOTAL!" });
+            return; 
+            }
+
+
             this.levelCompleted = true;
             console.log("Cambiando a nivel 2...");
             const moved = this.world.nextLevel();
@@ -500,17 +509,12 @@ class Sala {
             const playerUpdates = [];
             let spawnIndex = 0;
             for (const p of this.players.values()) {
-                // 1. Intentamos pillar un spawn diferente para cada uno
                 const spawnBase = this.world.spawns[spawnIndex % this.world.spawns.length] || { x: 100, y: 100 };
-                
-                // 2. Si hay muchos jugadores para pocos spawns, añadimos un pequeño desplazamiento en X
-                // para que no compartan el mismo pixel exacto
+    
                 const extraOffset = Math.floor(spawnIndex / this.world.spawns.length) * 40;
 
                 p.x = spawnBase.x + extraOffset;
                 p.y = spawnBase.y;
-                
-                // 3. Limpiar estados del nivel anterior
                 p.vx = 0;
                 p.vy = 0;
                 p.finished = false;
