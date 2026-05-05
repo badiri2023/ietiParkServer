@@ -73,6 +73,29 @@ class Sala {
         this.players.set(id, player);
     
         console.log(`${nickname} tiene asignado el color ${color}`);
+        if (!this.partidaId) {
+            this.partidaId = `partida_${Date.now()}`;
+
+            await this.Partides.insertOne({
+                _id: this.partidaId,
+                createdAt: new Date(),
+                players: []
+            });
+            //console.log("Partida creada:", this.partidaId);
+        }
+        await this.Partides.updateOne(
+            { _id: this.partidaId },
+            {
+                $push: {
+                    players: {
+                        id,
+                        nickname,
+                        hasKey: false,
+                        exitAt: null
+                    }
+                }
+            }
+        );
         
        // console.log(`WORLD: ${this.world.width}x${this.world.height}`);
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
@@ -95,19 +118,6 @@ class Sala {
 
         return { success: true, player };
     }
-    //funcion para guardar la partida
-
-    async registrarEnBD(id, nickname) {
-        if (!this.partidaId) {
-            this.partidaId = `partida_${Date.now()}`;
-            await this.Partides.insertOne({ _id: this.partidaId, players: [] });
-        }
-        await this.Partides.updateOne(
-            { _id: this.partidaId },
-            { $push: { players: { id, nickname, hasKey: false } } }
-        );
-    }
-
     removePlayer(id) {
         const player = this.players.get(id);
         if (!player) return;
@@ -427,19 +437,20 @@ class Sala {
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     async saveKeyTaken(player) {
-    try {
-        if (!this.Partides || !this.partidaId) return;
+        try {
+            if (!this.Partides || !this.partidaId) return;
 
-        await this.Partides.updateOne(
-            { _id: this.partidaId },
-            {
-                $set: {
-                "players.$.hasKey": true,
-              
-            }
-            },
-            { upsert: true }
-        );
+            await this.Partides.updateOne(
+                {
+                    _id: this.partidaId,
+                    "players.id": player.id
+                },
+                {
+                    $set: {
+                        "players.$.hasKey": true
+                    }
+                }
+            );
 
         } catch (err) {
             console.error("Error guardando key en Mongo:", err);
@@ -448,10 +459,6 @@ class Sala {
     async savePlayerExit(player) {
         if (!this.Partides || !this.partidaId) return;
 
-        const doc = await this.Partides.findOne({ _id: this.partidaId });
-
-        const finishedCount = doc.players.filter(p => p.exitAt).length;
-
         await this.Partides.updateOne(
             {
                 _id: this.partidaId,
@@ -459,8 +466,7 @@ class Sala {
             },
             {
                 $set: {
-        
-                    "players.$.position": finishedCount + 1
+                    "players.$.exitAt": new Date()
                 }
             }
         );
