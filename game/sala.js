@@ -234,7 +234,13 @@ class Sala {
             y: this.world.door.y,
             opened: this.world.door.opened
             } : null,
-            palanca: this.world.palanca,
+            palanca: this.world.palanca ? {
+            x: this.world.palanca.x,
+            y: this.world.palanca.y,
+            width: this.world.palanca.width,
+            height: this.world.palanca.height,
+            activated: this.world.palanca.activated
+            } : null,
             plataformaActivable: this.world.plataformaActivable
         };
     }
