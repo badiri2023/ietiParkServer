@@ -291,6 +291,7 @@ class Sala {
         for (const p of this.players.values()) {
             const prevX = p.x;
             const prevY = p.y;
+              console.log(`[PLAYER SERVER] ${p.nickname} -> x:${p.x.toFixed(2)} y:${p.y.toFixed(2)}`);
 
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
@@ -399,7 +400,7 @@ class Sala {
                 p.vx = 0;
                 p.vy = 0;
                 p.finished = false;
-                console.log(`[PLAYER SERVER] ${p.nickname} -> x:${p.x.toFixed(2)} y:${p.y.toFixed(2)}`);
+              
                 playerUpdates.push({ id: p.id, x: p.x, y: p.y });
                 i++;
             }
@@ -416,8 +417,10 @@ class Sala {
             //console.log("DOOR:", this.world.door.x,this.world.door.y);
             console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
 
-            this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
+            
         }
+                    console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
+        this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     async saveKeyTaken(player) {
     try {
