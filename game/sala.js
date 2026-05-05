@@ -425,9 +425,7 @@ class Sala {
                     });
                     this.savePlayerExit(p);
                 }
-                
-                console.log("palanca:", this.world.palanca?.activated);
-                console.log("this.palanca:", this.palanca);
+              
             }
            
              // Colisión con obstáculos
