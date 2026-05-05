@@ -352,7 +352,7 @@ class Sala {
                         // La añadimos a obstáculos para que ahora sí tenga colisión física
                         this.world.obstacles.push(this.world.plataformaActivable);
                     }
-
+                    console.log(`palanca activada `);
                     this.broadcast("SWITCH_ACTIVATED", {
                         nickname: p.nickname,
                         plataforma: this.world.plataformaActivable
@@ -416,12 +416,17 @@ class Sala {
            
              // Colisión con obstáculos
             for (const obs of this.world.obstacles) {
-                if (this.isColliding(p, obs)) {
+                if (p.vy >= 0 && (prevY + p.height) <= (obs.y + 10)) {
+                    p.y = obs.y - p.height;
+                    p.vy = 0;
+                    p.onGround = true;
+                } else {
+                    // Choque lateral o cabeza
                     p.x = prevX;
-                    p.y = prevY;
-             
+                    if (p.vy < 0) p.vy = 0; // Si choca el techo, deja de subir
                 }
             }
+        
 
             // Colisión con otros jugadores
             for (const other of this.players.values()) {

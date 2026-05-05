@@ -47,9 +47,9 @@ class Player {
         }
 
         //SERVER: Implementació dels salts i col·lisions entre usuaris (“s’apilen” un sobre l’altre) 
-        const speed = 5;
+        const speed = 10;
         const gravity = 0.8;
-        const jumpForce = -13;
+        const jumpForce = -15;
 
         // --- MOVIMIENTO HORIZONTAL ---
         if (this.input.left) this.vx = -speed;
