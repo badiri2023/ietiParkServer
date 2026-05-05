@@ -462,7 +462,7 @@ class Sala {
         //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
             this.levelCompleted = true;
-            if (this.world.palanca?.activated) {
+            if (this.world.currentLevelIndex === 1) {
              // Marcamos para no entrar más aquí
             console.log("**** PARTIDA FINALIZADA ****");
             this.broadcast("GAME_OVER", { type: "FIN", message: "¡VICTORIA TOTAL!" });
