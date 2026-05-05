@@ -40,39 +40,20 @@ class Sala {
         
         //asigno color
         const color = this.availableColors.shift();
-        const spawn = this.world.spawns[this.players.size % this.world.spawns.length];
-        let groundY = this.world.height;
+
+        
+        const spawnIndex = this.players.size % this.world.spawns.length;
+        const spawn = this.world.spawns[spawnIndex] || { x: 100, y: 100 };
+        
+       /* let groundY = this.world.height;
+
         for (const obs of this.world.obstacles) {
             if (spawn.x >= obs.x && spawn.x <= obs.x + obs.width) {
                 if (obs.y < groundY) {
                     groundY = obs.y;
                 }
             }
-        }
-
-        // colocar jugador encima del suelo
-        const spawnY = groundY - 90; // 90 = altura jugador
-        //console.log(`[SPAWN] Asignando posición: x=${spawn?.x}, y=${spawn?.y}`);
-        // 1. Definim els punts de sortida
-       /* const spawnPoints = [
-             { x: 70, y: 500 },
-            { x: 120, y: 500 },
-            { x: 170, y: 500 },
-            { x: 220, y: 500 },
-            { x: 270, y: 500 },
-            { x: 320, y: 500 },
-            { x: 370, y: 350 },
-            { x: 420, y: 350 }
-        ];*//*//config del json game_data.json
-        const playerConfig = this.world.sprites.find(s => s.type === "player1");
-        if (!playerConfig) {
-            return { success: false, 
-            message: "Error: Configuración de jugador no encontrada" };
-        }//probar si el jugador recibe bien la configuracion */
-        //Calculem on ha d'aparèixer segons quants jugadors hi ha
-        //const spawnPoints = this.world.spawns;
-        //const spawn = spawnPoints[this.players.size % spawnPoints.length];
-        
+        }*/
         
         //creo el jugador
         const player = new Player(
@@ -107,42 +88,26 @@ class Sala {
                 type: "WAITING", 
                 message: "Esperando jugadores..." }));
         }
+
+        return { success: true, player };
+    }
+    //funcion para guardar la partida
+
+    async registrarEnBD(id, nickname) {
         if (!this.partidaId) {
             this.partidaId = `partida_${Date.now()}`;
-
-            await this.Partides.insertOne({
-                _id: this.partidaId,
-                fecha: new Date(),
-                players: []
-            });
+            await this.Partides.insertOne({ _id: this.partidaId, fecha: new Date(), players: [] });
         }
         await this.Partides.updateOne(
             { _id: this.partidaId },
-            {
-                $push: {
-                    players: {
-                        id: id,
-                        nickname: nickname,
-                        tookKey: false
-                    }
-                }
-            }
+            { $push: { players: { id, nickname, tookKey: false } } }
         );
-
-        return { success: true, player };
     }
 
     removePlayer(id) {
         const player = this.players.get(id);
         if (!player) return;
         const nickname = player.nickname;
-
-        /*if (player) {
-            // RECICLAJE: Devolvemos el color al banco
-            //console.log(`${player.nickname} se ha  desconectado`);
-            this.availableColors.push(player.color);
-            this.players.delete(id);
-        }*/
        if (this.world.key.holderId === id) {
             this.world.key.holderId = null;
             this.world.key.collected = false;
@@ -319,6 +284,7 @@ class Sala {
 
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
+
         //array jugadores para este frame
         const playersList = Array.from(this.players.values());
         //actualizacion player
@@ -329,7 +295,11 @@ class Sala {
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
               // ********reinicio caida, sicae vuelve al inicio *****
-            if (p.y > this.world.height) {
+            if (p.y > this.world.height+100) {
+
+                this.resetPlayerToSpawn(p);
+
+
                 const spawn = this.world.spawns[
                     Math.floor(Math.random() * this.world.spawns.length)
                 ];
@@ -447,27 +417,34 @@ class Sala {
             //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
             this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
         }
-        }
-        async saveKeyTaken(player) {
-        try {
-            if (!this.Partides || !this.partidaId) return;
+    }
+    async saveKeyTaken(player) {
+    try {
+        if (!this.Partides || !this.partidaId) return;
 
-            await this.Partides.updateOne(
-                { _id: this.partidaId },
-                {
-                    $set: {
-                        keyTaken: true,
-                        keyHolderId: player.id,
-                        keyHolderNick: player.nickname,
-                        keyTakenAt: new Date()
-                    }
-                },
-                { upsert: true }
-            );
+        await this.Partides.updateOne(
+            { _id: this.partidaId },
+            {
+                $set: {
+                    keyTaken: true,
+                    keyHolderId: player.id,
+                    keyHolderNick: player.nickname,
+                    keyTakenAt: new Date()
+                }
+            },
+            { upsert: true }
+        );
 
         } catch (err) {
             console.error("Error guardando key en Mongo:", err);
         }
+    }
+    resetPlayerToSpawn(p) {
+        const spawn = this.world.spawns[0] || { x: 100, y: 100 };
+        p.x = spawn.x;
+        p.y = spawn.y;
+        p.vx = 0;
+        p.vy = 0;
     }
     
 }

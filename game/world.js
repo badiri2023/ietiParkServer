@@ -1,12 +1,8 @@
 const levelData = require('./game_data.json');
-const path = require('path');
-
 class World {
     constructor(levelIndex = 0) {
         this.levelIndex = levelIndex;
         this.currentLevel = null;
-        
-        // Propiedades del estado del juego
         this.width = 0;
         this.height = 0;
         this.obstacles = [];
@@ -17,22 +13,23 @@ class World {
 
         this.loadLevel(levelIndex);
     }
-
+        
+    
     loadLevel(index) {
         const level = levelData.levels[index];
         if (!level) {
-            console.error(`[ERROR] El nivel ${index} no existe en game_data.json`);
+            console.error("Nivel no existe:", index);
             return;
         }
+        
+
 
         this.currentLevel = level;
-        this.levelIndex = index;
-
-        // 1. Configurar dimensiones según el Viewport del JSON
+        this.sprites = level.sprites || [];
         this.width = level.viewportWidth || 1500;
         this.height = level.viewportHeight || 800;
 
-        // 2. Cargar Física desde el archivo de Zonas (La clave del éxito)
+        // Cargar Física desde el archivo de Zonas (La clave del éxito)
         this.obstacles = [];
         try {
             // Intentamos cargar el archivo que indica la propiedad "zonesFile"
@@ -57,8 +54,10 @@ class World {
             this.spawns = playerSprite ? [{ x: playerSprite.x, y: playerSprite.y }] : [{ x: 100, y: 100 }];
         }
 
-        // 3. Cargar Objetos (Puerta, Llave, Palanca) desde Sprites
+        //onsole.log("LEVELLLLL:", level);
+        //-----Puerta-------
         const doorSprite = level.sprites.find(s => s.type === "door");
+        
         this.door = doorSprite ? {
             x: doorSprite.x,
             y: doorSprite.y,
@@ -67,6 +66,15 @@ class World {
             opened: false
         } : null;
 
+        ///------spawns------
+        this.spawns = level.sprites
+            .filter(s => s.type === "player1"|| s.type === "skeleton1")
+            .map(s => ({
+                x: s.x,
+                y: s.y
+            }));
+
+        //-----key-----
         const keySprite = level.sprites.find(s => s.type === "key");
         this.key = keySprite ? {
             x: keySprite.x,
@@ -77,7 +85,10 @@ class World {
             holderId: null
         } : { x: 0, y: 0, width: 32, height: 32, collected: true }; // Si no hay llave, marcar como recogida
 
-        const palancaSprite = level.sprites.find(s => s.type === "palanca");
+        //palanca nivel 2
+
+
+        const palancaSprite = this.sprites.find(s => s.type === "palanca");
         this.palanca = palancaSprite ? {
             x: palancaSprite.x,
             y: palancaSprite.y,
@@ -85,20 +96,13 @@ class World {
             height: palancaSprite.height,
             activated: false
         } : null;
-
-        console.log(`[WORLD] Nivel cargado: ${level.name} (${this.width}x${this.height})`);
+        console.log(`Nivel cargado: ${level.name}`);
     }
 
-    /**
-     * Resetea el estado del nivel actual (por ejemplo si todos mueren)
-     */
     resetLevelState() {
         this.loadLevel(this.levelIndex);
     }
 
-    /**
-     * Avanza al siguiente nivel si existe
-     */
     nextLevel() {
         const nextIndex = this.levelIndex + 1;
         if (nextIndex < levelData.levels.length) {
@@ -109,21 +113,6 @@ class World {
         return false;
     }
 
-    /**
-     * Función de utilidad para detectar colisiones con obstáculos
-     * @param {Object} entity Objeto con x, y, width, height
-     */
-    checkObstacleCollision(entity) {
-        for (const obs of this.obstacles) {
-            if (entity.x < obs.x + obs.width &&
-                entity.x + entity.width > obs.x &&
-                entity.y < obs.y + obs.height &&
-                entity.y + entity.height > obs.y) {
-                return obs; // Retorna el obstáculo con el que choca
-            }
-        }
-        return null;
-    }
 }
 
 module.exports = World;

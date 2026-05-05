@@ -4,6 +4,7 @@ class Player {
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
+        this.world = world;
 
         // POSICIÓN: Viene de los cálculos de tu Sala
         this.x = spawnX;
@@ -19,8 +20,6 @@ class Player {
         this.finished = false;
         this.input = { left: false, right: false, jump: false };
         this.onGround = false;
-        this.worldWidth = world.width;  // Ajusta según tu mapa
-        this.worldHeight = world.height;
         
     }
  
@@ -41,28 +40,24 @@ class Player {
             return;
         }
 
-        //revisar para mejorar la friccion
-        /*const accel = 0.5;
-const maxSpeed = 5;
-const friction = 0.8;
+                    //revisar para mejorar la friccion
+                    /*const accel = 0.5;
+            const maxSpeed = 5;
+            const friction = 0.8;
 
-if (this.input.left) this.vx -= accel;
-if (this.input.right) this.vx += accel;
+            if (this.input.left) this.vx -= accel;
+            if (this.input.right) this.vx += accel;
 
-// límite velocidad
-this.vx = Math.max(-maxSpeed, Math.min(maxSpeed, this.vx));
+            // límite velocidad
+            this.vx = Math.max(-maxSpeed, Math.min(maxSpeed, this.vx));
 
-// fricción
-if (!this.input.left && !this.input.right) {
-    this.vx *= friction;
-}*/ 
+            // fricción
+            if (!this.input.left && !this.input.right) {
+                this.vx *= friction;
+            }*/ 
         //SERVER: Implementació dels salts i col·lisions entre usuaris (“s’apilen” un sobre l’altre) 
-       const speed = 5;
-
-        // ✔ gravedad coherente con canvas (Y hacia abajo)
+        const speed = 5;
         const gravity = 0.8;
-
-        // ✔ salto negativo (sube)
         const jumpForce = -15;
 
         // --- MOVIMIENTO HORIZONTAL ---
@@ -80,21 +75,50 @@ if (!this.input.left && !this.input.right) {
         this.vy += gravity;
         this.x += this.vx;
         this.y += this.vy;
+        //pared izquierda
+        if (this.x < 0) this.x = 0;
+        //pared derecha
+        if (this.x > this.world.width - this.width) {
+            this.x = this.world.width - this.width;
+        }
+        
+        this.onGround = false;
+        for (const obs of this.world.obstacles) {
+            if (this.checkCollision(this, obs)) {
+                // Si el jugador está cayendo y choca con el obstáculo
+                if (this.vy > 0 && (this.y + this.height) >= obs.y) {
+                    this.y = obs.y - this.height; // Lo ponemos justo encima
+                    this.vy = 0;
+                    this.onGround = true;
+                }
+            }
+        }
 
         // --- SUELO CORRECTO ---
-        const floorY = this.worldHeight - this.height;
+       /* const floorY = this.worldHeight - this.height;
         if (this.y >= floorY) {
             this.y = floorY;
             this.vy = 0;
             this.onGround = true;
-        }
+        }*
 
         // --- PAREDES ---
         if (this.x < 0) this.x = 0;
         if (this.x > this.worldWidth - this.width) {
             this.x = this.worldWidth - this.width;
+        }*/
+            if (this.y > this.world.height) {
+                this.y = this.world.height - this.height;
+                this.vy = 0;
+                this.onGround = true;
+            }
         }
-        
+        // Dentro de la clase Player
+        checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y;
     }
 }
 
