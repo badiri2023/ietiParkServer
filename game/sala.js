@@ -208,6 +208,10 @@ class Sala {
             platform: this.world.platform,
             plataformaActivable: this.world.plataformaActivable
         };
+        console.log("[DEBUG SALA] Enviando WORLD_DATA. ¿Tiene palanca?:", data.palanca ? "SÍ" : "NO");
+    if(data.palanca) console.log("Coordenadas palanca:", data.palanca.x, data.palanca.y);
+    
+    return data;
     }
     //estado del juego
     getState() {
@@ -298,6 +302,7 @@ class Sala {
             // Lógica mecánica: La plataforma móvil o activable aparece
             if (this.world.plataformaActivable) {
                 this.world.plataformaActivable.visible = true;
+                console.log(`[TRIGGER] ¡ACTIVADA! El jugador ${p.nickname} ha tocado la palanca`);
                 // Solo añadimos a obstáculos lo que SÍ debe ser sólido (la plataforma)
                 this.world.obstacles.push(this.world.plataformaActivable);
             }
