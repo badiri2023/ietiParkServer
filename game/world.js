@@ -101,8 +101,6 @@ class World {
                         this.palanca = {
                             x: z.x,
                             y: z.y,
-                            width: z.width,
-                            height: z.height,
                             activated: false
                         };
                         break;

@@ -279,6 +279,31 @@ class Sala {
             this.saveKeyTaken(p);
         }
     }
+    async checkPalancaCollision(p){
+        if (!this.world.palanca || this.world.palanca.activated) return;
+            if (this.isColliding(p, this.world.palanca)) {
+            this.world.palanca.activated = true;
+
+            console.log(`[EVENTO] ${p.nickname} activó la palanca`);
+
+            // Lógica mecánica: Mostrar plataforma activable
+            if (this.world.plataformaActivable) {
+                this.world.plataformaActivable.visible = true;
+                // La añadimos a obstáculos para que ahora sí sea sólida
+                this.world.obstacles.push(this.world.plataformaActivable);
+            }
+
+            // Notificar a los clientes
+            this.broadcast("SWITCH_ACTIVATED", {
+                playerId: p.id,
+                nickname: p.nickname
+            });
+
+            // Guardar en MongoDB quien fue el héroe que la activó
+            //await this.savePalancaActivated(p);
+        }
+
+    }
 
 
     // ****GAME LOOP
@@ -344,21 +369,8 @@ class Sala {
             }
 
             //palanca
-            if (this.world.palanca && !this.world.palanca.activated) {
-                if (this.isColliding(p, this.world.palanca)) {
-                    this.world.palanca.activated = true;
-                    if (this.world.plataformaActivable) {
-                        this.world.plataformaActivable.visible = true;
-                        // La añadimos a obstáculos para que ahora sí tenga colisión física
-                        this.world.obstacles.push(this.world.plataformaActivable);
-                    }
-                    console.log(`palanca activada `);
-                    this.broadcast("SWITCH_ACTIVATED", {
-                        nickname: p.nickname,
-                        plataforma: this.world.plataformaActivable
-                    });
-                }
-            }  
+            this.checkPalancaCollision(p);
+
             //activar plataforma
             if (this.world.switchActivated && this.world.platform) {
                 // Velocidad de la plataforma (2 píxeles por frame)
@@ -531,6 +543,29 @@ class Sala {
             console.error("Error al guardar salida en Mongo:", err);
         }
     }
+
+    /*async savePalancaActivated(player) {
+        try {
+            if (!this.Partides || !this.partidaId) return;
+
+            // Marcamos en la base de datos qué jugador activó el mecanismo
+            await this.Partides.updateOne(
+                {
+                    _id: this.partidaId,
+                    "players.id": player.id
+                },
+                {
+                    $set: {
+                        "players.$.activatedSwitch": true,
+                        "lastAction": `Palanca activada por ${player.nickname}`
+                    }
+                }
+            );
+            console.log(`[DB] Guardado: ${player.nickname} activó la palanca.`);
+        } catch (err) {
+            console.error("Error al guardar activación de palanca en Mongo:", err);
+        }
+    }*/
     resetPlayerToSpawn(p) {
         const spawn = this.world.spawns[0] || { x: 100, y: 100 };
         p.x = spawn.x;
