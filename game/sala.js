@@ -405,22 +405,32 @@ class Sala {
                 i++;
             }
 
-            this.broadcast("CHANGE_LEVEL", {
-                world: this.world.getWorldData(),
-                players: playerUpdates
-                });
-
+           this.broadcast("CHANGE_LEVEL", {
+            world: this.getWorldData(),
+            players: Array.from(this.players.values()).map(p => ({
+                id: p.id,
+                x: p.x,
+                y: p.y,
+                vx: 0,
+                vy: 0,
+                    finished: false
+                }))
+            });
+            setTimeout(() => {
             this.levelCompleted = false;
+            this.broadcast("STATE_UPDATE", this.getState());
+            }, 50);
+
+            return;
+
+            //this.levelCompleted = false;
             //const state = this.getState();
             //console.log("DEBUG SERVER:", JSON.stringify(state));
             //console.log("WORLD:", this.world.width, this.world.height);
             //console.log("DOOR:", this.world.door.x,this.world.door.y);
-            console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
-
-            
+            //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
         }
-                
-    this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
+        this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     async saveKeyTaken(player) {
     try {
