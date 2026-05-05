@@ -485,17 +485,25 @@ class Sala {
             
             // reseteo jugadores
             const playerUpdates = [];
-            let i = 0;
+            let spawnIndex = 0;
             for (const p of this.players.values()) {
-                const spawn = this.world.spawns[i % this.world.spawns.length];
-                p.x = spawn.x;
-                p.y = spawn.y;
+                // 1. Intentamos pillar un spawn diferente para cada uno
+                const spawnBase = this.world.spawns[spawnIndex % this.world.spawns.length] || { x: 100, y: 100 };
+                
+                // 2. Si hay muchos jugadores para pocos spawns, añadimos un pequeño desplazamiento en X
+                // para que no compartan el mismo pixel exacto
+                const extraOffset = Math.floor(spawnIndex / this.world.spawns.length) * 40;
+
+                p.x = spawnBase.x + extraOffset;
+                p.y = spawnBase.y;
+                
+                // 3. Limpiar estados del nivel anterior
                 p.vx = 0;
                 p.vy = 0;
                 p.finished = false;
-            
-                playerUpdates.push({ id: p.id, x: p.x, y: p.y });
-                i++;
+                p.falling = false;
+
+                spawnIndex++;
             }
 
            this.broadcast("CHANGE_LEVEL", {
