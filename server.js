@@ -17,6 +17,7 @@ let Records;
 ///--------------estado servidor
 //const sala = new Sala();
 let sala;
+let ready = false;
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 console.log("Servidor en ws://0.0.0.0:3000");
@@ -41,8 +42,9 @@ async function start() {
     await connectMongo();
 
     sala = new Sala(Partides);
+    ready = true;
 
-    console.log("Servidor listo");
+    //console.log("Servidor listo");
 }
 start();
 
@@ -78,7 +80,7 @@ wss.on('connection', (ws) => {
         if (msg.type === "JOIN") {
             myId = Math.random().toString(36).substring(2, 10);
 
-            const result = sala.addPlayer(myId, msg.nickname, ws);
+            const result = await sala.addPlayer(myId, msg.nickname, ws);
             //console.log("Resultado de addPlayer:", result);
 
             if (!result.success) {

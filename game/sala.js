@@ -253,16 +253,12 @@ class Sala {
 
     //****Key******** */
     // gestion llave quien la tiene 
-    checkKeyCollision(p) {
+    async checkKeyCollision(p) {
         if (this.world.key.collected) return;
 
         if (this.isColliding(p, this.world.key)) {
             this.world.key.collected = true;
             this.world.key.holderId = p.id;
-            this.keyTakenInfo = {
-                id: p.id,
-                nickname: p.nickname
-            };
 
             console.log(`${p.nickname} tiene la llave`);
 
@@ -270,6 +266,7 @@ class Sala {
             this.broadcast("KEY_COLLECTED", {
                 playerId: p.id
             });
+            this.saveKeyTaken(p);
         }
     }
 
@@ -350,6 +347,7 @@ class Sala {
                     this.broadcast("PLAYER_EXITED", {
                         playerId: p.id
                     });
+                    this.savePlayerExit(p);
                 }
             }
            
@@ -436,11 +434,9 @@ class Sala {
             { _id: this.partidaId },
             {
                 $set: {
-                    keyTaken: true,
-                    keyHolderId: player.id,
-                    keyHolderNick: player.nickname,
-                    keyTakenAt: new Date()
-                }
+                "players.$.hasKey": true,
+              
+            }
             },
             { upsert: true }
         );
@@ -448,6 +444,26 @@ class Sala {
         } catch (err) {
             console.error("Error guardando key en Mongo:", err);
         }
+    }
+    async savePlayerExit(player) {
+        if (!this.Partides || !this.partidaId) return;
+
+        const doc = await this.Partides.findOne({ _id: this.partidaId });
+
+        const finishedCount = doc.players.filter(p => p.exitAt).length;
+
+        await this.Partides.updateOne(
+            {
+                _id: this.partidaId,
+                "players.id": player.id
+            },
+            {
+                $set: {
+        
+                    "players.$.position": finishedCount + 1
+                }
+            }
+        );
     }
     resetPlayerToSpawn(p) {
         const spawn = this.world.spawns[0] || { x: 100, y: 100 };
