@@ -414,43 +414,41 @@ class Sala {
             }
             
             //detectar  quien cruza la puerta
+          
             if (this.world?.door?.opened && this.isColliding(p, this.world.door)) {
                 if (!p.finished) {
                     
-                    // --- LÓGICA UNIVERSAL DE VALIDACIÓN ---
-                    
-                    // 1. ¿Hay palanca en este nivel? Si hay, ¿está activada?
-                    const requierePalanca = this.world.palanca !== null && this.world.palanca !== undefined;
-                    const palancaLista = requierePalanca ? this.world.palanca.activated : true;
+                    // Comprobamos si la palanca está lista (si no hay palanca en el nivel, se considera lista)
+                    const palancaLista = this.world.palanca ? this.world.palanca.activated : true;
 
-                    // 2. ¿Tiene el jugador la llave? (Por si acaso se le requiere para cruzar físicamente)
-                    const tieneLlave = this.world.key.holderId === p.id;
-
-                    // --- VALIDACIÓN ---
                     if (palancaLista) {
-                        // El jugador puede pasar
                         p.finished = true;
-                        console.log(`${p.nickname} ha cruzado la puerta con éxito.`);
+                        console.log(`${p.nickname} ha cruzado la puerta.`);
 
-                        this.broadcast("PLAYER_EXITED", {
-                            playerId: p.id
-                        });
+                        // Notificamos que el jugador salió
+                        this.broadcast("PLAYER_EXITED", { playerId: p.id });
                         this.savePlayerExit(p);
 
-                        // --- DETECTAR SI ES EL ÚLTIMO NIVEL PARA DECIR "FIN" ---
-                        // Si moved es false en el bloque de abajo, o si sabemos que es el nivel 2:
-                        if (this.world.currentLevelIndex === 1) { 
-                            // Si prefieres que diga FIN en cuanto el PRIMERO cruza el nivel 2:
+                        // --- LÓGICA DE FINALIZACIÓN INMEDIATA ---
+                        // Si es el nivel 2 (index 1), disparamos el FIN aquí mismo
+                        if (this.world.currentLevelIndex === 1) {
+                            console.log("Has escapado.\n****FIN****");
+                            
                             this.broadcast("GAME_OVER", {
-                                message: "FIN",
+                                type: "FIN",
+                                message: "¡HAS LOGRADO ESCAPAR!",
                                 winner: p.nickname
                             });
+                            
+                            // Detenemos el movimiento de este jugador para que sepa que terminó
+                            p.vx = 0; 
+                            p.vy = 0;
                         }
                     } else {
-                        // Bloqueo: Si hay palanca pero no está activada, no le dejamos marcar "finished"
+                        // Si la palanca no está activada, rebotamos al jugador
                         p.x = prevX;
                         p.vx = 0;
-                        console.log(`${p.nickname} intentó salir, pero falta activar la palanca de este nivel.`);
+                        console.log(`${p.nickname} intentó salir sin activar la palanca.`);
                     }
                 }
             }
@@ -528,13 +526,6 @@ class Sala {
             
 
             return;
-
-            //this.levelCompleted = false;
-            //const state = this.getState();
-            //console.log("DEBUG SERVER:", JSON.stringify(state));
-            //console.log("WORLD:", this.world.width, this.world.height);
-            //console.log("DOOR:", this.world.door.x,this.world.door.y);
-            //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
         }
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
         
@@ -575,7 +566,6 @@ class Sala {
                 }
             }
         );
-            //console.log(`[DB] Guardado éxito: ${player.nickname} salió.`);
         } catch (err) {
             console.error("Error al guardar salida en Mongo:", err);
         }
@@ -598,7 +588,6 @@ class Sala {
                     }
                 }
             );
-            console.log(`[DB] Guardado: ${player.nickname} activó la palanca.`);
         } catch (err) {
             console.error("Error al guardar activación de palanca en Mongo:", err);
         }
