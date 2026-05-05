@@ -426,7 +426,7 @@ class Sala {
                     this.savePlayerExit(p);
 
                     if (this.world.levelIndex === 1) {
-                        console.log("**** FIN DIRECTO ****");
+                        console.log("\n******* FIN PARTIDA *******");
 
                         this.broadcast("GAME_OVER", {
                             type: "FIN",
