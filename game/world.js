@@ -5,7 +5,12 @@ class World {
         this.currentLevel = null;
         this.width = 0;
         this.height = 0;
+        
         this.obstacles = [];
+        his.platforms = [];      // plataformas
+        this.hazards = [];        // precipicios
+        this.interactables = [];
+        
         this.spawns = [];
         this.door = null;
         this.key = null;
@@ -27,35 +32,69 @@ class World {
         this.currentLevel = level;
         this.sprites = level.sprites || [];
         this.layers = level.layers || [];
-        //this.width = level.viewportWidth || 1500;
-        //this.height = level.viewportHeight || 800;
+
         this.width = 1000;
         this.height = 600;
 
         // Cargar Física desde el archivo de Zonas (La clave del éxito)
         this.obstacles = [];
+        this.platforms = [];
+        this.hazards = [];
+        this.interactables = [];
+        this.spawns = [];
+
         try {
             // Intentamos cargar el archivo que indica la propiedad "zonesFile"
             // Nota: Asegúrate de que la ruta relativa sea correcta en tu servidor
             const zonesData = require(`./${level.zonesFile}`);
             
             if (zonesData && zonesData.zones) {
-                // Filtramos las zonas de colisión (suelos y paredes)
-                this.obstacles = zonesData.zones.filter(z => z.type === "Default");
-                
-                // Buscamos el punto de aparición oficial del nivel
-                const spawnZone = zonesData.zones.find(z => z.type === "spawn");
-                if (spawnZone) {
-                    this.spawns = [{ x: spawnZone.x, y: spawnZone.y }];
+                for (const z of zonesData.zones) {
+                    switch (z.type) {
+
+                        case "Default":
+                            this.obstacles.push(z);
+                            break;
+
+                        case "plataforma":
+                            this.platforms.push(z);
+                            break;
+
+                        case "precipicio":
+                            this.hazards.push(z);
+                            break;
+
+                        case "spawn":
+                            this.spawns.push({ x: z.x, y: z.y });
+                            break;
+
+                        case "key":
+                        case "exitdoor":
+                        case "palanca":
+                            this.interactables.push(z);
+                            break;
+                    }
                 }
             }
-            console.log(`[WORLD] Física cargada correctamente desde ${level.zonesFile}`);
-        } catch (err) {
+
+            console.log(`[WORLD] Cargado: ${level.zonesFile}`);
+            } catch (err) {
+                console.warn(`[WARN] No se pudo cargar: ${level.zonesFile}`);
+
+                const fallback = this.sprites.find(
+                    s => s.type === "player1" || s.type === "skeleton1"
+                );
+
+                this.spawns = fallback
+                    ? [{ x: fallback.x, y: fallback.y }]
+                    : [{ x: 100, y: 100 }];
+        }
+        /*} catch (err) {
             console.warn(`[WARN] No se pudo cargar zonesFile (${level.zonesFile}). Usando datos de respaldo.`);
             // Backup: si falla el archivo de zonas, intentamos usar la posición del sprite player1
             const playerSprite = level.sprites.find(s => s.type === "player1" || s.type === "skeleton1");
             this.spawns = playerSprite ? [{ x: playerSprite.x, y: playerSprite.y }] : [{ x: 100, y: 100 }];
-        }
+        }*/
 
         //onsole.log("LEVELLLLL:", level);
         //-----Puerta-------

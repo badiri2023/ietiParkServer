@@ -461,11 +461,7 @@ class Sala {
                 _id: this.partidaId,
                 "players.id": player.id
             },
-            {
-                $set: {
-                    "players.$.exitAt": new Date()
-                }
-            }
+        
         );
     }
     resetPlayerToSpawn(p) {
