@@ -355,7 +355,7 @@ class Sala {
 
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
-            //-----------------precipicio-----------
+            //-----------------precipicio
             for (const h of this.world.hazards) {
                 if (this.isColliding(p, h) && !p.falling) {
                     console.log(`${p.nickname} cayó al precipicio`);
@@ -414,45 +414,19 @@ class Sala {
             }
             
             //detectar  quien cruza la puerta
-          
             if (this.world?.door?.opened && this.isColliding(p, this.world.door)) {
                 if (!p.finished) {
-                    
-                    // Comprobamos si la palanca está lista (si no hay palanca en el nivel, se considera lista)
-                    const palancaLista = this.world.palanca ? this.world.palanca.activated : true;
+                    p.finished = true;
 
-                    if (palancaLista) {
-                        p.finished = true;
-                        console.log(`${p.nickname} ha cruzado la puerta.`);
+                    console.log(`${p.nickname} ha cruzado la puerta`);
 
-                        // Notificamos que el jugador salió
-                        this.broadcast("PLAYER_EXITED", { playerId: p.id });
-                        this.savePlayerExit(p);
-
-                        // --- LÓGICA DE FINALIZACIÓN INMEDIATA ---
-                        // Si es el nivel 2 (index 1), disparamos el FIN aquí mismo
-                        if (this.world.currentLevelIndex === 1) {
-                            console.log("Has escapado.\n****FIN****");
-                            
-                            this.broadcast("GAME_OVER", {
-                                type: "FIN",
-                                message: "¡HAS LOGRADO ESCAPAR!",
-                                winner: p.nickname
-                            });
-                            
-                            // Detenemos el movimiento de este jugador para que sepa que terminó
-                            p.vx = 0; 
-                            p.vy = 0;
-                        }
-                    } else {
-                        // Si la palanca no está activada, rebotamos al jugador
-                        p.x = prevX;
-                        p.vx = 0;
-                        console.log(`${p.nickname} intentó salir sin activar la palanca.`);
-                    }
+                    this.broadcast("PLAYER_EXITED", {
+                        playerId: p.id
+                    });
+                    this.savePlayerExit(p);
                 }
             }
-                    
+           
              // Colisión con obstáculos
             for (const obs of this.world.obstacles) {
                 if (this.isColliding(p, obs)) {
@@ -486,10 +460,9 @@ class Sala {
         const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
         //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
-            if (this.world.currentLevelIndex === 1) {
+            if (this.world.palanca?.activated) {
             this.levelCompleted = true; // Marcamos para no entrar más aquí
             console.log("**** PARTIDA FINALIZADA ****");
-            // Opcional: un broadcast final de seguridad
             this.broadcast("GAME_OVER", { type: "FIN", message: "¡VICTORIA TOTAL!" });
             return; 
             }
@@ -509,6 +482,7 @@ class Sala {
             const playerUpdates = [];
             let spawnIndex = 0;
             for (const p of this.players.values()) {
+
                 const spawnBase = this.world.spawns[spawnIndex % this.world.spawns.length] || { x: 100, y: 100 };
     
                 const extraOffset = Math.floor(spawnIndex / this.world.spawns.length) * 40;
@@ -570,6 +544,7 @@ class Sala {
                 }
             }
         );
+            
         } catch (err) {
             console.error("Error al guardar salida en Mongo:", err);
         }
@@ -592,6 +567,7 @@ class Sala {
                     }
                 }
             );
+        
         } catch (err) {
             console.error("Error al guardar activación de palanca en Mongo:", err);
         }
