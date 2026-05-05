@@ -101,6 +101,9 @@ class World {
                         this.palanca = {
                             x: z.x,
                             y: z.y,
+                            width: z.width , 
+                            height: z.height ,
+                            activated: false,
                             activated: false
                         };
                         break;
@@ -170,7 +173,7 @@ class World {
         //palanca nivel 2
 
 
-        const palancaSprite =level.sprites.find(s => s.type === "palanca");
+        /*const palancaSprite =level.sprites.find(s => s.type === "palanca");
 
         this.palanca = palancaSprite ? {
             x: palancaSprite.x,
@@ -178,7 +181,7 @@ class World {
             width: palancaSprite.width,
             height: palancaSprite.height,
             activated: false
-        } : null;
+        } : null;*/
         console.log(`Nivel cargado: ${level.name}`);
     }
 
