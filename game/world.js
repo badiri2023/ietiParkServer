@@ -33,8 +33,8 @@ class World {
         this.sprites = level.sprites || [];
         this.layers = level.layers || [];
 
-        this.width = 1000;
-        this.height = 600;
+        this.width = 1500;
+        this.height = 800;
 
         // Cargar Física desde el archivo de Zonas (La clave del éxito)
         this.obstacles = [];
