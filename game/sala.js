@@ -289,7 +289,7 @@ class Sala {
         const playersList = Array.from(this.players.values());
         //actualizacion player
         for (const p of this.players.values()) {
-            console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
+            console.log(`[PLAYER>>>] ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
             const prevX = p.x;
             const prevY = p.y;
 
@@ -419,8 +419,8 @@ class Sala {
 
             
         }
-                    console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
-        this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
+                
+    this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
     }
     async saveKeyTaken(player) {
     try {
