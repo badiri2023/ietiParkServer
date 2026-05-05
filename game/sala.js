@@ -279,30 +279,30 @@ class Sala {
             this.saveKeyTaken(p);
         }
     }
-    async checkPalancaCollision(p){
+    async checkPalancaCollision(p) {
+        // Si no hay palanca o ya está activada, salimos
         if (!this.world.palanca || this.world.palanca.activated) return;
-            if (this.isColliding(p, this.world.palanca)) {
+
+        // Detectamos si el jugador pasa por encima
+        if (this.isColliding(p, this.world.palanca)) {
             this.world.palanca.activated = true;
 
-            console.log(`[EVENTO] ${p.nickname} activó la palanca`);
+            console.log(`[TRIGGER] ${p.nickname} activó la palanca al pasar`);
 
-            // Lógica mecánica: Mostrar plataforma activable
+            // Lógica mecánica: La plataforma móvil o activable aparece
             if (this.world.plataformaActivable) {
                 this.world.plataformaActivable.visible = true;
-                // La añadimos a obstáculos para que ahora sí sea sólida
+                // Solo añadimos a obstáculos lo que SÍ debe ser sólido (la plataforma)
                 this.world.obstacles.push(this.world.plataformaActivable);
             }
 
-            // Notificar a los clientes
+            // Notificamos a Flutter
             this.broadcast("SWITCH_ACTIVATED", {
                 playerId: p.id,
                 nickname: p.nickname
             });
-
-            // Guardar en MongoDB quien fue el héroe que la activó
-            //await this.savePalancaActivated(p);
+            await this.savePalancaActivated(p);
         }
-
     }
 
 
@@ -368,8 +368,7 @@ class Sala {
                 }
             }
 
-            //palanca
-            this.checkPalancaCollision(p);
+            
 
             //activar plataforma
             if (this.world.switchActivated && this.world.platform) {
@@ -393,6 +392,9 @@ class Sala {
 
             // *****Key******
             this.checkKeyCollision(p);
+
+            //palanca
+            this.checkPalancaCollision(p);
             //*****Puerta
             if (this.world?.door && !this.world.door.opened && this.isColliding(p, this.world.door)) {
                 const hasKey = this.world.key.holderId === p.id;

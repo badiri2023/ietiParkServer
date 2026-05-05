@@ -170,9 +170,7 @@ class World {
         //palanca nivel 2
 
 
-        const palancaSprite = (this.sprites || []).find(
-            s => s.type === "palanca"
-        );
+        const palancaSprite =level.sprites.find(s => s.type === "palanca");
 
         this.palanca = palancaSprite ? {
             x: palancaSprite.x,
