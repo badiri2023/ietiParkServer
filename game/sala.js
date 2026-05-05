@@ -100,8 +100,6 @@ class Sala {
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
             const worldInitData = this.getWorldData(); 
-        //console.log(`[WORLD_INIT] Enviando datos a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
-            
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
                 data: this.getWorldData() // Usamos el método que separamos antes
@@ -208,10 +206,6 @@ class Sala {
             platform: this.world.platform,
             plataformaActivable: this.world.plataformaActivable
         };
-        console.log("[DEBUG SALA] Enviando WORLD_DATA. ¿Tiene palanca?:", data.palanca ? "SÍ" : "NO");
-        if(data.palanca) console.log("Coordenadas palanca:", data.palanca.x, data.palanca.y);
-    
-        return data;
     }
     //estado del juego
     getState() {
@@ -297,17 +291,14 @@ class Sala {
         if (this.isColliding(p, this.world.palanca)) {
             this.world.palanca.activated = true;
 
-            console.log(`[TRIGGER] ${p.nickname} activó la palanca al pasar`);
-
-            // Lógica mecánica: La plataforma móvil o activable aparece
+        // Lógica mecánica: La plataforma móvil o activable aparece
             if (this.world.plataformaActivable) {
                 this.world.plataformaActivable.visible = true;
-                console.log(`[TRIGGER] ¡ACTIVADA! El jugador ${p.nickname} ha tocado la palanca`);
+                console.log(`[ ¡PALANCA ACTIVADA! El jugador ${p.nickname} ha tocado la palanca`);
                 // Solo añadimos a obstáculos lo que SÍ debe ser sólido (la plataforma)
                 this.world.obstacles.push(this.world.plataformaActivable);
             }
 
-            // Notificamos a Flutter
             this.broadcast("SWITCH_ACTIVATED", {
                 playerId: p.id,
                 nickname: p.nickname
@@ -334,9 +325,6 @@ class Sala {
         ///plataforma activable
         if (this.world.palanca?.activated && this.world.platform) {
             this.world.platform.x += 2 * this.world.platform.direction;
-
-            // Límites dinámicos: si se aleja mucho de su X inicial (657), cambia de dirección
-            // Esto evita poner números fijos de píxeles
             if (Math.abs(this.world.platform.x - 657) > 200) { 
                 this.world.platform.direction *= -1;
             }
@@ -414,7 +402,7 @@ class Sala {
                     //si no tiene llave el jugador rebota contra la puerta
                     p.x = prevX;
                     p.vx = 0;
-                    console.log(`${p.nickname} no puedes pasar, no tienes la llave`);
+                    console.log(`${p.nickname} no puedes pasar, no tienes la llave\n`);
                 } else {
                     //aqui controlo si el jugador que tiene la llave puede abrirla
                     this.world.door.opened = true;
@@ -428,21 +416,48 @@ class Sala {
             //detectar  quien cruza la puerta
             if (this.world?.door?.opened && this.isColliding(p, this.world.door)) {
                 if (!p.finished) {
-                    p.finished = true;
+                    
+                    // --- LÓGICA UNIVERSAL DE VALIDACIÓN ---
+                    
+                    // 1. ¿Hay palanca en este nivel? Si hay, ¿está activada?
+                    const requierePalanca = this.world.palanca !== null && this.world.palanca !== undefined;
+                    const palancaLista = requierePalanca ? this.world.palanca.activated : true;
 
-                    console.log(`${p.nickname} ha cruzado la puerta`);
+                    // 2. ¿Tiene el jugador la llave? (Por si acaso se le requiere para cruzar físicamente)
+                    const tieneLlave = this.world.key.holderId === p.id;
 
-                    this.broadcast("PLAYER_EXITED", {
-                        playerId: p.id
-                    });
-                    this.savePlayerExit(p);
+                    // --- VALIDACIÓN ---
+                    if (palancaLista) {
+                        // El jugador puede pasar
+                        p.finished = true;
+                        console.log(`${p.nickname} ha cruzado la puerta con éxito.`);
+
+                        this.broadcast("PLAYER_EXITED", {
+                            playerId: p.id
+                        });
+                        this.savePlayerExit(p);
+
+                        // --- DETECTAR SI ES EL ÚLTIMO NIVEL PARA DECIR "FIN" ---
+                        // Si moved es false en el bloque de abajo, o si sabemos que es el nivel 2:
+                        if (this.world.currentLevelIndex === 1) { 
+                            // Si prefieres que diga FIN en cuanto el PRIMERO cruza el nivel 2:
+                            this.broadcast("GAME_OVER", {
+                                message: "FIN",
+                                winner: p.nickname
+                            });
+                        }
+                    } else {
+                        // Bloqueo: Si hay palanca pero no está activada, no le dejamos marcar "finished"
+                        p.x = prevX;
+                        p.vx = 0;
+                        console.log(`${p.nickname} intentó salir, pero falta activar la palanca de este nivel.`);
+                    }
                 }
             }
-           
+                    
              // Colisión con obstáculos
             for (const obs of this.world.obstacles) {
                 if (this.isColliding(p, obs)) {
-                    console.log(`[FÍSICA] Bloqueado por: ${obs.name} (Tipo: ${obs.type})`);
                     p.x = prevX;
                     p.y = prevY;
              
