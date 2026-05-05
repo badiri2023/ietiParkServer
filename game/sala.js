@@ -355,7 +355,7 @@ class Sala {
 
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
 
-            //-----------------precipicio
+            //-----------------precipicio-----------
             for (const h of this.world.hazards) {
                 if (this.isColliding(p, h) && !p.falling) {
                     console.log(`${p.nickname} cayó al precipicio`);
