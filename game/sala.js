@@ -392,18 +392,24 @@ class Sala {
                 console.log("terminado")
                 return;
             }
-            this.world.key.collected = false;
-            this.world.key.holderId = null;
+         
+             
 
-            if (this.world.door) {
-                this.world.door.opened = false;
-            }
-
-            // RESET PLAYERS
-            this.resetPlayers();
             
-
-
+            // reseteo jugadores
+            const playerUpdates = [];
+            let i = 0;
+            for (const p of this.players.values()) {
+                const spawn = this.world.spawns[i % this.world.spawns.length];
+                p.x = spawn.x;
+                p.y = spawn.y;
+                p.vx = 0;
+                p.vy = 0;
+                p.finished = false;
+            
+                playerUpdates.push({ id: p.id, x: p.x, y: p.y });
+                i++;
+            }
 
            this.broadcast("CHANGE_LEVEL", {
             world: this.getWorldData(),
