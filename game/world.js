@@ -50,29 +50,63 @@ class World {
             
             if (zonesData && zonesData.zones) {
                 for (const z of zonesData.zones) {
-                    switch (z.type) {
+                   switch (z.type) {
 
-                        case "Default":
-                            this.obstacles.push(z);
-                            break;
+                    case "Default":
+                        this.obstacles.push(z);
+                        break;
 
-                        case "plataforma":
-                            this.platforms.push(z);
-                            break;
+                    case "plataforma":
+                        this.platforms.push(z);
+                        break;
 
-                        case "precipicio":
-                            this.hazards.push(z);
-                            break;
+                    case "precipicio":
+                        this.hazards.push(z);
+                        break;
 
-                        case "spawn":
-                            this.spawns.push({ x: z.x, y: z.y });
-                            break;
+                    case "spawn":
+                        this.spawns.push({ x: z.x, y: z.y });
+                        break;
 
-                        case "key":
-                        case "exitdoor":
-                        case "palanca":
-                            this.interactables.push(z);
-                            break;
+                    case "key":
+                        this.key = {
+                            x: z.x,
+                            y: z.y,
+                            width: z.width,
+                            height: z.height,
+                            collected: false,
+                            holderId: null
+                        };
+                        break;
+
+                    case "exitdoor":
+                        this.door = {
+                            x: z.x,
+                            y: z.y,
+                            width: z.width,
+                            height: z.height,
+                            opened: false
+                        };
+                        break;
+
+                    case "palanca":
+                        this.palanca = {
+                            x: z.x,
+                            y: z.y,
+                            width: z.width,
+                            height: z.height,
+                            activated: false
+                        };
+                        break;
+                    case "plataformaactivable":
+                        this.plataformaActivable = {
+                            x: z.x,
+                            y: z.y,
+                            width: z.width,
+                            height: z.height,
+                            visible: false // Empieza invisible/desactivada
+                        };
+                        break;
                     }
                 }
             }

@@ -9,7 +9,6 @@ class Sala {
         this.maxPlayers = 8;
 
         this.world = new World();
-        
         this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
@@ -21,6 +20,20 @@ class Sala {
     
         this.partidaId = null;
         this.Partides = partidesCollection;
+
+
+        // NIVEL 2 STADOS
+        this.world.switchActivated = false;
+        this.world.plataformaActivable = null;
+        this.world.platform = {
+            x: 657,
+            y: 321,
+            width: 162,
+            height: 31,
+            direction: 1,
+            active: false
+        };
+
         //  game loop (30 FPS) aqui controlo el tiempo de envio de posiciones 
         this.interval = setInterval(() => this.update(), 1000 / 30);
     }
@@ -43,20 +56,9 @@ class Sala {
         
         //asigno color
         const color = this.availableColors.shift();
-
         
         const spawnIndex = this.players.size % this.world.spawns.length;
         const spawn = this.world.spawns[spawnIndex] || { x: 100, y: 100 };
-        
-       /* let groundY = this.world.height;
-
-        for (const obs of this.world.obstacles) {
-            if (spawn.x >= obs.x && spawn.x <= obs.x + obs.width) {
-                if (obs.y < groundY) {
-                    groundY = obs.y;
-                }
-            }
-        }*/
         
         //creo el jugador
         const player = new Player(
@@ -204,7 +206,9 @@ class Sala {
             layers : this.world.layers,
             door: this.world.door,
             key: this.world.key,
-            palanca: this.world.palanca
+            palanca: this.world.palanca,
+            platform: this.world.platform,
+            plataformaActivable: this.world.plataformaActivable
         };
     }
     //estado del juego
@@ -232,7 +236,8 @@ class Sala {
             y: this.world.door.y,
             opened: this.world.door.opened
             } : null,
-            palanca: this.world.palanca
+            palanca: this.world.palanca,
+            plataformaActivable: this.world.plataformaActivable
         };
     }
     //flutter 
@@ -289,12 +294,23 @@ class Sala {
             this.broadcast("WORLD_INIT", worldData);
             this.broadcast("GAME_START", {});
         }
-
         // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
 
+        ///plataforma activable
+        if (this.world.palanca?.activated && this.world.platform) {
+            this.world.platform.x += 2 * this.world.platform.direction;
+
+            // Límites dinámicos: si se aleja mucho de su X inicial (657), cambia de dirección
+            // Esto evita poner números fijos de píxeles
+            if (Math.abs(this.world.platform.x - 657) > 200) { 
+                this.world.platform.direction *= -1;
+            }
+        }
+
         //array jugadores para este frame
         const playersList = Array.from(this.players.values());
+        
         //------------------actualizacion players
         for (const p of this.players.values()) {
             //console.log(`[PLAYER>>>] ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
@@ -302,25 +318,16 @@ class Sala {
             const prevY = p.y;
             //suaviso caida 
             if (p.falling) {
-
                 p.fallTimer--;
-
-                // efecto visual / caída rápida
                 p.vy += 2;
-
                 if (p.fallTimer <= 0) {
-
                     const spawn = this.world.spawns[0] || { x: 100, y: 100 };
-
                     p.x = spawn.x;
                     p.y = spawn.y;
-
                     p.vx = 0;
                     p.vy = 0;
-
                     p.falling = false;
                 }
-
                 continue; // evita que siga colisionando mientras cae
             }
 
@@ -329,23 +336,53 @@ class Sala {
             //-----------------precipicio
             for (const h of this.world.hazards) {
                 if (this.isColliding(p, h) && !p.falling) {
-
                     console.log(`${p.nickname} cayó al precipicio`);
-
                     // activar estado de caída
                     p.falling = true;
                     p.fallTimer = 15; // frames (~0.5s a 30fps)
-
-                    // congelar movimiento
                     p.vx = 0;
                     p.vy = 0;
                 }
             }
+
+            //palanca
+            if (this.world.palanca && !this.world.palanca.activated) {
+                if (this.isColliding(p, this.world.palanca)) {
+                    this.world.palanca.activated = true;
+                    if (this.world.plataformaActivable) {
+                        this.world.plataformaActivable.visible = true;
+                        // La añadimos a obstáculos para que ahora sí tenga colisión física
+                        this.world.obstacles.push(this.world.plataformaActivable);
+                    }
+
+                    this.broadcast("SWITCH_ACTIVATED", {
+                        nickname: p.nickname,
+                        plataforma: this.world.plataformaActivable
+                    });
+                }
+            }  
+            //activar plataforma
+            if (this.world.switchActivated && this.world.platform) {
+                // Velocidad de la plataforma (2 píxeles por frame)
+                this.world.platform.x += 2 * this.world.platform.direction;
+
+                // Límites para que vaya y vuelva por el precipicio
+                // El precipicio está entre x=448 y x=896
+                if (this.world.platform.x > 850) this.world.platform.direction = -1; // Rebota a la derecha
+                if (this.world.platform.x < 450) this.world.platform.direction = 1;  // Rebota a la izquierda
+            }
+            if (this.world.palanca?.activated && this.isColliding(p, this.world.platform)) {
+                if (p.vy >= 0 && p.y + p.height <= this.world.platform.y + 10) {
+                    p.y = this.world.platform.y - p.height;
+                    p.vy = 0;
+                    p.onGround = true;
+                    p.x += 2 * this.world.platform.direction; // Mueve al jugador con la plataforma
+                }
+            }
+
+
             // *****Key******
             this.checkKeyCollision(p);
-
-          
-
             //*****Puerta
             if (this.world?.door && !this.world.door.opened && this.isColliding(p, this.world.door)) {
                 const hasKey = this.world.key.holderId === p.id;
@@ -393,7 +430,8 @@ class Sala {
                 if (p.id === other.id) continue; // No chocamos contra nosotros mismos
 
                 if (this.isPlayerColliding(p, other)) {
-                    if (p.vy > 0 && p.y + p.height < other.y + other.height / 2) {
+                    //if (p.vy > 0 && p.y + p.height < other.y + other.height / 2) {
+                    if (p.vy > 0 && p.y + p.height < other.y + 45) {
                         p.y = other.y - p.height;
                         p.vy = 0;
                         p.onGround = true; // Permite saltar desde la cabeza de otro
@@ -420,8 +458,6 @@ class Sala {
                 return;
             }
          
-             
-
             
             // reseteo jugadores
             const playerUpdates = [];
@@ -454,7 +490,9 @@ class Sala {
             //console.log(`PLAYER ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
         }
         this.broadcast("STATE_UPDATE", this.getState()); //broadcast es para actualizar a los clientes que va pasando, lo que envio aqui players: [{ id, x, y, color, nickname }]} */
+        
     }
+
     async saveKeyTaken(player) {
         try {
             if (!this.Partides || !this.partidaId) return;
@@ -490,11 +528,11 @@ class Sala {
                 }
             }
         );
-        console.log(`[DB] Guardado éxito: ${player.nickname} salió.`);
-    } catch (err) {
-        console.error("Error al guardar salida en Mongo:", err);
+            console.log(`[DB] Guardado éxito: ${player.nickname} salió.`);
+        } catch (err) {
+            console.error("Error al guardar salida en Mongo:", err);
+        }
     }
-}
     resetPlayerToSpawn(p) {
         const spawn = this.world.spawns[0] || { x: 100, y: 100 };
         p.x = spawn.x;
