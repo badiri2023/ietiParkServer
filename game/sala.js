@@ -455,6 +455,7 @@ class Sala {
         }
     }
     async savePlayerExit(player) {
+    try {
         if (!this.Partides || !this.partidaId) return;
 
         await this.Partides.updateOne(
@@ -462,9 +463,17 @@ class Sala {
                 _id: this.partidaId,
                 "players.id": player.id
             },
-        
+            {
+                $set: {
+                    "players.$.finished": true
+                }
+            }
         );
+        console.log(`[DB] Guardado éxito: ${player.nickname} salió.`);
+    } catch (err) {
+        console.error("Error al guardar salida en Mongo:", err);
     }
+}
     resetPlayerToSpawn(p) {
         const spawn = this.world.spawns[0] || { x: 100, y: 100 };
         p.x = spawn.x;
