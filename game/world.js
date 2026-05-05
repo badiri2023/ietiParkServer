@@ -121,7 +121,7 @@ class World {
                 }
             }
 
-            console.log(`[WORLD] Cargado: ${level.zonesFile}`);
+
             } catch (err) {
                 console.warn(`[WARN] No se pudo cargar: ${level.zonesFile}`);
 
