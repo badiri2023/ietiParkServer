@@ -7,7 +7,7 @@ class World {
         this.height = 0;
         
         this.obstacles = [];
-        his.platforms = [];      // plataformas
+        this.platforms = [];      // plataformas
         this.hazards = [];        // precipicios
         this.interactables = [];
         
@@ -129,7 +129,10 @@ class World {
         //palanca nivel 2
 
 
-        const palancaSprite = this.sprites.find(s => s.type === "palanca");
+        const palancaSprite = (this.sprites || []).find(
+            s => s.type === "palanca"
+        );
+
         this.palanca = palancaSprite ? {
             x: palancaSprite.x,
             y: palancaSprite.y,

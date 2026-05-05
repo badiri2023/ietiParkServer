@@ -280,7 +280,7 @@ class Sala {
 
     // ****GAME LOOP
     update() {
-        //Inicio de partida
+        //------------------Inicio de partida
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
             console.log("¡Partida iniciada!");
@@ -295,35 +295,35 @@ class Sala {
 
         //array jugadores para este frame
         const playersList = Array.from(this.players.values());
-        //actualizacion player
+        //------------------actualizacion players
         for (const p of this.players.values()) {
             //console.log(`[PLAYER>>>] ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
             const prevX = p.x;
             const prevY = p.y;
 
             p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
+            //-----------------precipicio
+            for (const h of this.world.hazards) {
+            if (this.isColliding(p, h)) {
 
-              // ********reinicio caida, sicae vuelve al inicio *****
-            if (p.y > this.world.height+100) {
+                console.log(` ${p.nickname} cayó al precipicio`);
 
-                this.resetPlayerToSpawn(p);
-
-
-                const spawn = this.world.spawns[
-                    Math.floor(Math.random() * this.world.spawns.length)
-                ];
+                const spawn = this.world.spawns[0] || { x: 100, y: 100 };
 
                 p.x = spawn.x;
                 p.y = spawn.y;
+
                 p.vx = 0;
                 p.vy = 0;
-            }
 
-           
+                    break;
+                }
+            }  
 
             // *****Key******
             this.checkKeyCollision(p);
-            // si la puerta aún está cerrada
+
+          
 
             //*****Puerta
             if (this.world?.door && !this.world.door.opened && this.isColliding(p, this.world.door)) {
@@ -343,8 +343,8 @@ class Sala {
                     });
                 }
             }
+            
             //detectar  quien cruza la puerta
-       
             if (this.world?.door?.opened && this.isColliding(p, this.world.door)) {
                 if (!p.finished) {
                     p.finished = true;
@@ -366,8 +366,6 @@ class Sala {
              
                 }
             }
-            
-             /***coliosiones player */
 
             // Colisión con otros jugadores
             for (const other of this.players.values()) {
@@ -382,6 +380,9 @@ class Sala {
                         // Colisión lateral normal (el jugador rebota/se bloquea)
                         p.x = prevX; 
                     }
+                }
+                if (p.y > this.world.height + 100) {
+                    this.resetPlayerToSpawn(p);
                 }
             }
         }
