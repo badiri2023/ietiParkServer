@@ -135,31 +135,6 @@ class Sala {
 
         console.log(`Jugador ${nickname} desconectado`);
     }
-    resetPlayers() {
-        let i = 0;
-
-        for (const p of this.players.values()) {
-            const spawn = this.world.spawns[i % this.world.spawns.length];
-
-            p.x = spawn.x;
-            p.y = spawn.y;
-            p.vx = 0;
-            p.vy = 0;
-            p.finished = false;
-            p.onGround = false;
-
-            i++;
-        }
-
-        // reset llave
-        this.world.key.collected = false;
-        this.world.key.holderId = null;
-
-        // reset puerta
-        if (this.world.door) {
-            this.world.door.opened = false;
-        }
-    }
 
     getPlayer(id) {
         return this.players.get(id);
@@ -417,15 +392,24 @@ class Sala {
                 console.log("terminado")
                 return;
             }
+            this.world.key.collected = false;
+            this.world.key.holderId = null;
+
+            if (this.world.door) {
+                this.world.door.opened = false;
+            }
+
+            // RESET PLAYERS
             this.resetPlayers();
-            this.world.resetLevelState?.();
+            
+
 
 
            this.broadcast("CHANGE_LEVEL", {
             world: this.getWorldData(),
             players: this.getState().players
             });
-            this.levelCompleted = false;
+            
 
             return;
 
