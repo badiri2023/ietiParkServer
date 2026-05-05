@@ -461,11 +461,11 @@ class Sala {
         }
         //*****Nivel completado
         const allFinished = playersList.length > 0 && playersList.every(p => p.finished);
-        console.log("allFinished:", allFinished);
         //aqui se controla que todos pasen la puerta y cambiamos de nivel
         if (allFinished && !this.levelCompleted) {
+            this.levelCompleted = true;
             if (this.world.palanca?.activated) {
-            this.levelCompleted = true; // Marcamos para no entrar más aquí
+             // Marcamos para no entrar más aquí
             console.log("**** PARTIDA FINALIZADA ****");
             this.broadcast("GAME_OVER", { type: "FIN", message: "¡VICTORIA TOTAL!" });
             return; 
