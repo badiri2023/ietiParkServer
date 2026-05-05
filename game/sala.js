@@ -100,9 +100,7 @@ class Sala {
         // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
             const worldInitData = this.getWorldData(); 
-
-        // 2. DESPUÉS haces el log
-        console.log(`[WORLD_INIT] Enviando datos a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
+        //console.log(`[WORLD_INIT] Enviando datos a ${nickname}. Puerta en: x=${worldInitData.door?.x}`);
             
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
@@ -528,7 +526,7 @@ class Sala {
                 }
             }
         );
-            console.log(`[DB] Guardado éxito: ${player.nickname} salió.`);
+            //console.log(`[DB] Guardado éxito: ${player.nickname} salió.`);
         } catch (err) {
             console.error("Error al guardar salida en Mongo:", err);
         }
