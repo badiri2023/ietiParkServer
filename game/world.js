@@ -5,8 +5,11 @@ class World {
         this.currentLevel = null;
         this.width = 0;
         this.height = 0;
-        this.obstacles = [];
+        
+        this.obstacles = [];//paredes suelo
+        this.voidZones = []; //precipicio
         this.spawns = [];
+        
         this.door = null;
         this.key = null;
         this.palanca = null;
@@ -27,37 +30,62 @@ class World {
         this.currentLevel = level;
         this.sprites = level.sprites || [];
         this.layers = level.layers || [];
-        //this.width = level.viewportWidth || 1500;
-        //this.height = level.viewportHeight || 800;
+        
         this.width = 1000;
         this.height = 600;
 
         // Cargar Física desde el archivo de Zonas (La clave del éxito)
         this.obstacles = [];
+        this.voidZones = [];
+        this.spawns = [];
+        //let zonesData = null;
         try {
-            // Intentamos cargar el archivo que indica la propiedad "zonesFile"
-            // Nota: Asegúrate de que la ruta relativa sea correcta en tu servidor
-            const zonesData = require(`./${level.zonesFile}`);
-            
-            if (zonesData && zonesData.zones) {
-                // Filtramos las zonas de colisión (suelos y paredes)
-                this.obstacles = zonesData.zones.filter(z => z.type === "Default");
-                
-                // Buscamos el punto de aparición oficial del nivel
+            zonesData = require(`./${level.zonesFile}`);
+
+            if (zonesData?.zones) {
+
+                // suelos / paredes / plataformas sólidas
+                this.obstacles = zonesData.zones.filter(z =>
+                    z.type === "Default" || z.type === "plataforma"
+                );
+
+                // precipicios (caída)
+                this.voidZones = zonesData.zones.filter(
+                    z => z.type === "precipicio"
+                );
+
+                // spawn desde zonas
                 const spawnZone = zonesData.zones.find(z => z.type === "spawn");
+
                 if (spawnZone) {
-                    this.spawns = [{ x: spawnZone.x, y: spawnZone.y }];
+                    this.spawns.push({
+                        x: spawnZone.x,
+                        y: spawnZone.y
+                    });
                 }
             }
-            console.log(`[WORLD] Física cargada correctamente desde ${level.zonesFile}`);
+
         } catch (err) {
-            console.warn(`[WARN] No se pudo cargar zonesFile (${level.zonesFile}). Usando datos de respaldo.`);
-            // Backup: si falla el archivo de zonas, intentamos usar la posición del sprite player1
-            const playerSprite = level.sprites.find(s => s.type === "player1" || s.type === "skeleton1");
-            this.spawns = playerSprite ? [{ x: playerSprite.x, y: playerSprite.y }] : [{ x: 100, y: 100 }];
+            console.warn(`[WORLD] zonesFile falló: ${level.zonesFile}`);
+
+        }
+        // ---------------- FALLBACK SPAWN ----------------
+        if (this.spawns.length === 0) {
+            const fallback = this.sprites.find(
+                s => s.type === "player1" || s.type === "skeleton1"
+            );
+
+            if (fallback) {
+                this.spawns = [{ x: fallback.x, y: fallback.y }];
+            } else {
+                this.spawns = [{ x: 100, y: 100 }];
+            }
         }
 
-        //onsole.log("LEVELLLLL:", level);
+
+
+
+        console.log("LEVELLLLL:", level);
         //-----Puerta-------
         const doorSprite = level.sprites.find(s => s.type === "door");
         
@@ -68,13 +96,6 @@ class World {
             height: doorSprite.height,
             opened: false
         } : null;
-
-        ///------spawns------
-        if (this.spawns.length === 0) {
-        this.spawns = level.sprites
-            .filter(s => s.type === "player1" || s.type === "skeleton1")
-            .map(s => ({ x: s.x, y: s.y }));
-        }
 
         //-----key-----
         const keySprite = level.sprites.find(s => s.type === "key");
@@ -103,6 +124,12 @@ class World {
 
     resetLevelState() {
         this.loadLevel(this.levelIndex);
+        /*if (this.door) this.door.opened = false;
+
+        if (this.key) {
+            this.key.collected = false;
+            this.key.holderId = null;
+        }*/ 
     }
 
     nextLevel() {
