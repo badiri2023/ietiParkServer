@@ -21,12 +21,17 @@ let Records;
 let sala;
 let ready = false;
 //qr
-app.get('/descarga', (req, res) => {
-  res.sendFile(__dirname + '/public_qr/index.html');
-});
+app.use(express.static(path.join(__dirname, 'public_qr')));
 
-app.listen(80, '0.0.0.0', () => {
-  console.log('HTTP en 80');
+// --- 2. RUTA DEL QR (CORREGIDA) ---
+app.get('/descarga', (req, res) => {
+    const filePath = path.join(__dirname, 'public_qr', 'index.html');
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error("❌ No se encuentra el archivo index.html en public_qr");
+            res.status(404).send("Archivo no encontrado");
+        }
+    });
 });
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
