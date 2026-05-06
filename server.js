@@ -31,7 +31,7 @@ app.get('/descarga', (req, res) => {
     const filePath = path.join(__dirname, 'public_qr', 'index.html');
     res.sendFile(filePath, (err) => {
         if (err) {
-            console.error("❌ No se encuentra el archivo index.html en public_qr");
+            console.error(" No se encuentra el archivo index.html en public_qr");
             res.status(404).send("Archivo no encontrado");
         }
     });
@@ -39,7 +39,8 @@ app.get('/descarga', (req, res) => {
 
 const PORT_HTTP = 8080; 
 app.listen(PORT_HTTP, '0.0.0.0', () => {
-    console.log(`Servidor Web listo en: http://tu-ip-local:${PORT_HTTP}/descarga`);
+    //console.log(`Servidor Web listo en: http://tu-ip-local:${PORT_HTTP}/descarga`);
+    console.log("web");
 });
 
 //const wss = new WebSocket.Server({ port: 3000 });
