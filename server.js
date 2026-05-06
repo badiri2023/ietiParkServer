@@ -24,8 +24,8 @@ let ready = false;
 ///qr
 app.use('/descarga', express.static('public_qr'));
 
-app.listen(80, () => {
-  console.log('Servidor web en puerto 80');
+app.listen(8080, '0.0.0.0', () => {
+  console.log('HTTP en 8080');
 });
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
