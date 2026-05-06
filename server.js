@@ -3,9 +3,6 @@ const app = express();
 const WebSocket = require('ws');
 const {MongoClient} = require('mongodb');
 const Sala = require('./game/sala');
-const path = require('path'); // <--- Añade esta línea
-
-// ... resto de tus require
 let partidaNumero = 0;
 
 ///---------------config Mongo
@@ -23,57 +20,13 @@ let Records;
 //const sala = new Sala();
 let sala;
 let ready = false;
-//qr
-app.use(express.static(path.join(__dirname, 'public_qr')));
-const sessions = new Map();
 
-//  RUTA DEL QR 
-app.get('/descarga', (req, res) => {
-    const filePath = path.join(__dirname, 'public_qr', 'index.html');
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            console.error(" No se encuentra el archivo index.html en public_qr");
-            res.status(404).send("Archivo no encontrado");
-        }
-    });
+///qr
+app.use('/descarga', express.static('public_qr'));
+
+app.listen(8080, '0.0.0.0', () => {
+  console.log('HTTP en 8080');
 });
-app.get('/qr', (req, res) => {
-    const sessionId = Math.random().toString(36).substring(2, 10);
-
-    sessions.set(sessionId, {
-        wsWeb: null,
-        connected: false
-    });
-
-    res.json({ sessionId });
-});
-app.post('/connect', express.json(), (req, res) => {
-    const { sessionId } = req.body;
-
-    const session = sessions.get(sessionId);
-
-    if (!session) {
-        return res.status(404).send("No existe sesión");
-    }
-
-    session.connected = true;
-
-    // avisar a la web
-    if (session.wsWeb) {
-        session.wsWeb.send(JSON.stringify({
-            type: "APK_CONNECTED"
-        }));
-    }
-
-    res.json({ ok: true });
-});
-
-const PORT_HTTP = 8080; 
-app.listen(PORT_HTTP, '0.0.0.0', () => {
-    console.log(`Servidor Web`);
-    
-});
-
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 console.log("Servidor en ws://0.0.0.0:3000");
@@ -84,6 +37,7 @@ async function connectMongo() {
     await client.connect();
 
     db = client.db('pico4_db');
+
     Jugadors = db.collection('jugadors');
     //Nivells = db.collection('nivells');
     Partides = db.collection('partides');
@@ -97,6 +51,7 @@ async function start() {
 
     sala = new Sala(Partides);
     ready = true;
+
     //console.log("Servidor listo");
 }
 start();
@@ -114,6 +69,7 @@ wss.on('connection', (ws) => {
 
     ws.on('message', async (message) => {
         let msg;
+        // evitar crash por JSON inválido
         try {
             msg = JSON.parse(message);
         } catch {
@@ -127,16 +83,6 @@ wss.on('connection', (ws) => {
             sala.addViewer(ws);
             return;
         }
-        ws.on('message', (message) => {
-    
-
-        if (msg.type === "REGISTER_QR") {
-            const session = sessions.get(msg.sessionId);
-            if (session) {
-                session.wsWeb = ws;
-                }
-            }
-        });
 
         // ****Player JOIN
         if (msg.type === "JOIN") {
@@ -164,12 +110,12 @@ wss.on('connection', (ws) => {
                                 color: playerActual.color
                             }
                         },
-                        { upsert: true } 
+                        { upsert: true }
                     );
                 } catch (err) {
                     console.error("Error guardando jugador en Mongo:", err);
                 }
-            }    
+            }
             
             ws.send(JSON.stringify({
                 type: "WELCOME",
@@ -188,6 +134,7 @@ wss.on('connection', (ws) => {
             const player = sala.getPlayer(myId);
             if (!player) return;
 
+            //  actualizar inputs
             player.input.left = msg.left;
             player.input.right = msg.right;
             player.input.jump = msg.jump;
