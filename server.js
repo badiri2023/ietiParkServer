@@ -3,6 +3,9 @@ const app = express();
 const WebSocket = require('ws');
 const {MongoClient} = require('mongodb');
 const Sala = require('./game/sala');
+const path = require('path'); // <--- Añade esta línea
+
+// ... resto de tus require
 let partidaNumero = 0;
 
 ///---------------config Mongo
@@ -23,7 +26,7 @@ let ready = false;
 //qr
 app.use(express.static(path.join(__dirname, 'public_qr')));
 
-// --- 2. RUTA DEL QR (CORREGIDA) ---
+//  RUTA DEL QR 
 app.get('/descarga', (req, res) => {
     const filePath = path.join(__dirname, 'public_qr', 'index.html');
     res.sendFile(filePath, (err) => {
@@ -33,6 +36,12 @@ app.get('/descarga', (req, res) => {
         }
     });
 });
+
+const PORT_HTTP = 8080; 
+app.listen(PORT_HTTP, '0.0.0.0', () => {
+    console.log(`Servidor Web listo en: http://tu-ip-local:${PORT_HTTP}/descarga`);
+});
+
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 console.log("Servidor en ws://0.0.0.0:3000");
