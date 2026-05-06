@@ -9,7 +9,7 @@ class Sala {
         this.maxPlayers = 8;
 
         this.world = new World();
-        this.gameStarted = true; //true para pruebas de un solo jugador el definitivo es false
+        this.gameStarted = false; //true para pruebas de un solo jugador el definitivo es false
         this.viewers = new Set();
         this.finishedPlayers = new Set();// variable para controla que todos pasen por la puerta 
         
