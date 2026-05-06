@@ -97,7 +97,6 @@ class Sala {
         );
         
        // console.log(`WORLD: ${this.world.width}x${this.world.height}`);
-        // Si la partida ya empezó, enviamos el mundo al nuevo jugador al instante
         if (this.gameStarted) {
             const worldInitData = this.getWorldData(); 
             ws.send(JSON.stringify({
@@ -125,12 +124,8 @@ class Sala {
                 reason: "PLAYER_LEFT"
             });
         }
-
-        // eliminar jugador
         this.availableColors.push(player.color);
         this.players.delete(id);
-
-        // eventos del juego
         this.broadcast("PLAYER_LEFT", {
             id,
             nickname
@@ -219,8 +214,7 @@ class Sala {
                 color: p.color
             })),
             key: {
-                // Si hay portador, la llave sigue al jugador. 
-                // Si no, se queda en su sitio original.
+
                 x: holder ? holder.x + (holder.width / 4) : this.world.key.x,
                 y: holder ? holder.y + 50 : this.world.key.y, 
                 collected: this.world.key.collected,
@@ -284,18 +278,13 @@ class Sala {
         }
     }
     async checkPalancaCollision(p) {
-        // Si no hay palanca o ya está activada, salimos
         if (!this.world.palanca || this.world.palanca.activated) return;
 
-        // Detectamos si el jugador pasa por encima
         if (this.isColliding(p, this.world.palanca)) {
             this.world.palanca.activated = true;
-
-        // Lógica mecánica: La plataforma móvil o activable aparece
             if (this.world.plataformaActivable) {
                 this.world.plataformaActivable.visible = true;
                 console.log(`[ ¡PALANCA ACTIVADA! El jugador ${p.nickname} ha tocado la palanca`);
-                // Solo añadimos a obstáculos lo que SÍ debe ser sólido (la plataforma)
                 this.world.obstacles.push(this.world.plataformaActivable);
             }
 
@@ -314,12 +303,10 @@ class Sala {
         if (!this.gameStarted && this.players.size >= this.minPlayers) {
             this.gameStarted = true;
             console.log("¡Partida iniciada!");
-            //se envia el mundo cuando esten todoss
             const worldData = this.getWorldData();
             this.broadcast("WORLD_INIT", worldData);
             this.broadcast("GAME_START", {});
         }
-        // Si la partida no ha empezado, no movemos a nadie
         if (!this.gameStarted) return;
 
         ///plataforma activable
@@ -338,7 +325,6 @@ class Sala {
             //console.log(`[PLAYER>>>] ${p.nickname} -> X:${p.x.toFixed(2)} Y:${p.y.toFixed(2)}`);
             const prevX = p.x;
             const prevY = p.y;
-            //suaviso caida 
             if (p.falling) {
                 p.fallTimer--;
                 p.vy += 2;
@@ -350,10 +336,9 @@ class Sala {
                     p.vy = 0;
                     p.falling = false;
                 }
-                continue; // evita que siga colisionando mientras cae
+                continue; 
             }
-
-            p.update(); // Actualizamos físicas osea mover jugador, aplicar gravedad y actualizo x,y
+            p.update();
 
             //-----------------precipicio
             for (const h of this.world.hazards) {
@@ -361,7 +346,7 @@ class Sala {
                     console.log(`${p.nickname} cayó al precipicio`);
                     // activar estado de caída
                     p.falling = true;
-                    p.fallTimer = 15; // frames (~0.5s a 30fps)
+                    p.fallTimer = 15; 
                     p.vx = 0;
                     p.vy = 0;
                 }
@@ -376,15 +361,15 @@ class Sala {
 
                 // Límites para que vaya y vuelva por el precipicio
                 // El precipicio está entre x=448 y x=896
-                if (this.world.platform.x > 850) this.world.platform.direction = -1; // Rebota a la derecha
-                if (this.world.platform.x < 450) this.world.platform.direction = 1;  // Rebota a la izquierda
+                if (this.world.platform.x > 850) this.world.platform.direction = -1; //rebote derec
+                if (this.world.platform.x < 450) this.world.platform.direction = 1;  
             }
             if (this.world.palanca?.activated && this.isColliding(p, this.world.platform)) {
                 if (p.vy >= 0 && p.y + p.height <= this.world.platform.y + 10) {
                     p.y = this.world.platform.y - p.height;
                     p.vy = 0;
                     p.onGround = true;
-                    p.x += 2 * this.world.platform.direction; // Mueve al jugador con la plataforma
+                    p.x += 2 * this.world.platform.direction; 
                 }
             }
 
@@ -451,16 +436,15 @@ class Sala {
 
             // Colisión con otros jugadores
             for (const other of this.players.values()) {
-                if (p.id === other.id) continue; // No chocamos contra nosotros mismos
+                if (p.id === other.id) continue; 
 
                 if (this.isPlayerColliding(p, other)) {
                     //if (p.vy > 0 && p.y + p.height < other.y + other.height / 2) {
                     if (p.vy > 0 && p.y + p.height < other.y + 45) {
                         p.y = other.y - p.height;
                         p.vy = 0;
-                        p.onGround = true; // Permite saltar desde la cabeza de otro
+                        p.onGround = true; 
                     } else {
-                        // Colisión lateral normal (el jugador rebota/se bloquea)
                         p.x = prevX; 
                     }
                 }

@@ -37,7 +37,6 @@ async function connectMongo() {
     await client.connect();
 
     db = client.db('pico4_db');
-
     Jugadors = db.collection('jugadors');
     //Nivells = db.collection('nivells');
     Partides = db.collection('partides');
@@ -110,12 +109,13 @@ wss.on('connection', (ws) => {
                                 color: playerActual.color
                             }
                         },
-                        { upsert: true }
+                        { upsert: true } // Si no existe, lo crea. Si existe, lo actualiza.
                     );
                 } catch (err) {
                     console.error("Error guardando jugador en Mongo:", err);
                 }
             }
+            
             
             ws.send(JSON.stringify({
                 type: "WELCOME",
