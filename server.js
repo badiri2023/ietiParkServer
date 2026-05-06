@@ -20,14 +20,13 @@ let Records;
 //const sala = new Sala();
 let sala;
 let ready = false;
-
-///qr
+//qr
 app.get('/descarga', (req, res) => {
   res.sendFile(__dirname + '/public_qr/index.html');
 });
 
-app.listen(8080, '0.0.0.0', () => {
-  console.log('HTTP en 8080');
+app.listen(80, '0.0.0.0', () => {
+  console.log('HTTP en 80');
 });
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
