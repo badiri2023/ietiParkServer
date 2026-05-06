@@ -1,59 +1,109 @@
 class Player {
-    constructor(id, nickname, ws, startX, startY) {
-        // Identificació
+    ///tambien tiene que tener un color 
+    constructor(id, nickname, ws, spawnX, spawnY, color, world) {
         this.id = id;
         this.nickname = nickname;
         this.ws = ws;
-  
+        this.world = world;
+        this.x = spawnX;
+        this.y = spawnY;
 
-        // Posició (On està al món)
-        this.x = startX;
-        this.y = startY;
+        this.width = 30;
+        this.height = 90;
+ 
+        this.vx = 0;
+        this.vy = 0;
+        this.color = color;
+        this.finished = false;
+        this.input = { left: false, right: false, jump: false };
+        this.onGround = false;
+        this.falling = false;
+        this.fallTimer = 0;
+    }
 
-        // velocidad
-        this.vx = 0; // Velocitat horitzontal
-        this.vy = 0; // Velocitat vertical (gravetat)
-      
-        this.input = {
-            left: false,
-            right: false,
-            jump: false
-        };
+    checkCollision(rect1, rect2) {
+        return rect1.x < rect2.x + rect2.width &&
+            rect1.x + rect1.width > rect2.x &&
+            rect1.y < rect2.y + rect2.height &&
+            rect1.y + rect1.height > rect2.y;
+    }
 
-        this.onGround = true; // para salto simple
+    setColor(color) {
+        this.color = color;
     }
 
     // Actualización por tick
     update() {
-        const speed = 5;
-        const gravity = 1;
-        const jumpForce = -15;
-
-        //  Movimiento horizontal
+        //si cruzó la puerta se bloque el jugador
+        if (this.finished) {
+            this.vx = 0;
+            this.vy = 0;
+            return;
+        }
+        const speed = 10;
+        const gravity = 0.8;
+        const jumpForce = -11;
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
         else this.vx = 0;
 
-        // Salto (solo si está en suelo)
+        // --- SALTO ---
         if (this.input.jump && this.onGround) {
             this.vy = jumpForce;
             this.onGround = false;
         }
 
-        //  Gravedad
+        // --- FÍSICA ---
         this.vy += gravity;
-
-        //  Aplicar movimiento
         this.x += this.vx;
-        this.y += this.vy;
 
-        //  Suelo simple (sin hitbox)
-        if (this.y >= 0) {
-            this.y = 0;
+        for (const obs of this.world.obstacles) {
+            if (this.checkCollision(this, obs)) {
+                if (this.vx > 0) {
+                    this.x = obs.x - this.width;
+                } else if (this.vx < 0) {
+                    this.x = obs.x + obs.width;
+                }
+                this.vx = 0;
+            }
+        }
+
+        this.y += this.vy;
+        this.onGround = false;
+
+        for (const obs of this.world.obstacles) {
+            if (this.checkCollision(this, obs)) {
+
+                if (this.vy > 0) {
+                    // cayendo encima del suelo
+                    this.y = obs.y - this.height;
+                    this.onGround = true;
+                } else if (this.vy < 0) {
+                    // chocando con techo
+                    this.y = obs.y + obs.height;
+                }
+
+                this.vy = 0;
+            }
+        }
+
+        // LIMITES DEL MUNDO
+        if (this.x < 0) this.x = 0;
+
+        if (this.x > this.world.width - this.width) {
+            this.x = this.world.width - this.width;
+        }
+
+        if (this.y > this.world.height) {
+            this.y = this.world.height - this.height;
             this.vy = 0;
             this.onGround = true;
+        }
+        if (this.y < -500) {
+            this.y = 0;
+            this.vy = 0;
         }
     }
 }
 
-module.exports = Player
+module.exports = Player;

@@ -5,9 +5,10 @@ const ws = new WebSocket('ws://localhost:3000');
 
 ws.on('open', () => {
     console.log(' Conectado al servidor');
+   
     
     // Simular un JOIN
-    ws.send(JSON.stringify({ type: 'JOIN', nickname: 'JugadorTest' }));
+    ws.send(JSON.stringify({ type: 'JOIN', nickname: 'jugadortest' }));
     
     // Simular movimiento (presionar derecha) cada 100ms
     setInterval(() => {
@@ -20,5 +21,8 @@ ws.on('message', (data) => {
     if (msg.type === 'STATE_UPDATE') {
         // Aquí verás cómo se mueven los jugadores en la consola
         console.log('Posición recibida:', msg.data.players[0].x);
+    }
+        if (msg.type === "PLAYER_LIST"){
+        console.log(msg)
     }
 });

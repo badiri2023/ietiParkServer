@@ -21,6 +21,9 @@ ws.on('message', (data) => {
     if (msg.type === 'WELCOME'){
         console.log(msg)
     }
+    if (msg.type === "PLAYER_LIST"){
+        console.log(msg)
+    }
     /*if (msg.type === 'STATE_UPDATE') {
         // Aquí verás cómo se mueven los jugadores en la consola
         console.log('Posición recibida:', msg.data.players[0].x);
