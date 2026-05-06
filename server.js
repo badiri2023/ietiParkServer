@@ -20,6 +20,13 @@ let Records;
 //const sala = new Sala();
 let sala;
 let ready = false;
+
+///qr
+app.use('/descarga', express.static('public_qr'));
+
+app.listen(80, () => {
+  console.log('Servidor web en puerto 80');
+});
 //const wss = new WebSocket.Server({ port: 3000 });
 const wss = new WebSocket.Server({ port: 3000, host: '0.0.0.0' });
 console.log("Servidor en ws://0.0.0.0:3000");
