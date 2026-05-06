@@ -1,3 +1,5 @@
+const express = require('express');
+const app = express();
 const WebSocket = require('ws');
 const {MongoClient} = require('mongodb');
 const Sala = require('./game/sala');
