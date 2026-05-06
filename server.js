@@ -22,7 +22,9 @@ let sala;
 let ready = false;
 
 ///qr
-app.use('/descarga', express.static('public_qr'));
+app.get('/descarga', (req, res) => {
+  res.sendFile(__dirname + '/public_qr/index.html');
+});
 
 app.listen(8080, '0.0.0.0', () => {
   console.log('HTTP en 8080');

@@ -2,46 +2,27 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Descargar Pico4</title>
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      margin-top: 80px;
-    }
-
-    .qr {
-      margin-top: 30px;
-    }
-
-    img {
-      width: 250px;
-      height: 250px;
-    }
-
-    a {
-      color: #00ffcc;
-      font-size: 18px;
-      display: block;
-      margin-top: 20px;
-      text-decoration: none;
-    }
-  </style>
+  <title>Descargar App</title>
 </head>
 
-<body>
+<body style="text-align:center; font-family:Arial; background:#111; color:white; padding-top:50px;">
 
   <h1>📱 Descargar Pico4</h1>
-  <p>Escanea el QR para descargar la app</p>
 
-  <div class="qr">
-    <!-- QR generado automáticamente -->
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://piko4.ieti.site/descarga/app.apk">
-  </div>
+  <p>Escanea el QR o descarga la app</p>
 
-  <a href="app.apk">⬇ Descargar APK manual</a>
+  <!-- QR -->
+  <img
+    src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://piko4.ieti.site/descarga/app.apk"
+    alt="QR descarga"
+  />
+
+  <br><br>
+
+  <!-- descarga directa -->
+  <a href="app.apk" style="color:#00ffcc; font-size:18px;">
+    ⬇ Descargar APK
+  </a>
 
 </body>
 </html>
