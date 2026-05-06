@@ -5,16 +5,12 @@ class Player {
         this.nickname = nickname;
         this.ws = ws;
         this.world = world;
-
-        // POSICIÓN: Viene de los cálculos de tu Sala
         this.x = spawnX;
         this.y = spawnY;
 
-        // hitbox de los jugadores
         this.width = 30;
         this.height = 90;
  
-        // PROPIEDADES
         this.vx = 0;
         this.vy = 0;
         this.color = color;
@@ -25,7 +21,6 @@ class Player {
         this.fallTimer = 0;
     }
 
-    // colisión AABB
     checkCollision(rect1, rect2) {
         return rect1.x < rect2.x + rect2.width &&
             rect1.x + rect1.width > rect2.x &&
@@ -45,13 +40,9 @@ class Player {
             this.vy = 0;
             return;
         }
-
-        //SERVER: Implementació dels salts i col·lisions entre usuaris (“s’apilen” un sobre l’altre) 
         const speed = 10;
         const gravity = 0.8;
         const jumpForce = -11;
-
-        // --- MOVIMIENTO HORIZONTAL ---
         if (this.input.left) this.vx = -speed;
         else if (this.input.right) this.vx = speed;
         else this.vx = 0;
@@ -64,10 +55,6 @@ class Player {
 
         // --- FÍSICA ---
         this.vy += gravity;
-
-        // =========================
-        // MOVIMIENTO X + COLISION
-        // =========================
         this.x += this.vx;
 
         for (const obs of this.world.obstacles) {
@@ -81,9 +68,6 @@ class Player {
             }
         }
 
-        // =========================
-        // MOVIMIENTO Y + COLISION
-        // =========================
         this.y += this.vy;
         this.onGround = false;
 
@@ -103,9 +87,7 @@ class Player {
             }
         }
 
-        // =========================
         // LIMITES DEL MUNDO
-        // =========================
         if (this.x < 0) this.x = 0;
 
         if (this.x > this.world.width - this.width) {
@@ -117,8 +99,6 @@ class Player {
             this.vy = 0;
             this.onGround = true;
         }
-
-        // FIX IMPORTANTE: seguridad extra
         if (this.y < -500) {
             this.y = 0;
             this.vy = 0;

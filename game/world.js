@@ -35,8 +35,6 @@ class World {
 
         this.width = 1500;
         this.height = 800;
-
-        // Cargar Física desde el archivo de Zonas (La clave del éxito)
         this.obstacles = [];
         this.platforms = [];
         this.hazards = [];
@@ -44,8 +42,7 @@ class World {
         this.spawns = [];
 
         try {
-            // Intentamos cargar el archivo que indica la propiedad "zonesFile"
-            // Nota: Asegúrate de que la ruta relativa sea correcta en tu servidor
+            
             const zonesData = require(`./${level.zonesFile}`);
             
             if (zonesData && zonesData.zones) {
@@ -114,7 +111,7 @@ class World {
                             y: z.y,
                             width: z.width,
                             height: z.height,
-                            visible: false // Empieza invisible/desactivada
+                            visible: false 
                         };
                         break;
                     }
@@ -133,12 +130,7 @@ class World {
                     ? [{ x: fallback.x, y: fallback.y }]
                     : [{ x: 100, y: 100 }];
         }
-        /*} catch (err) {
-            console.warn(`[WARN] No se pudo cargar zonesFile (${level.zonesFile}). Usando datos de respaldo.`);
-            // Backup: si falla el archivo de zonas, intentamos usar la posición del sprite player1
-            const playerSprite = level.sprites.find(s => s.type === "player1" || s.type === "skeleton1");
-            this.spawns = playerSprite ? [{ x: playerSprite.x, y: playerSprite.y }] : [{ x: 100, y: 100 }];
-        }*/
+    
 
         //onsole.log("LEVELLLLL:", level);
         //-----Puerta-------
@@ -168,8 +160,7 @@ class World {
             height: keySprite.height,
             collected: false,
             holderId: null
-        } : { x: 0, y: 0, width: 32, height: 32, collected: true }; // Si no hay llave, marcar como recogida
-
+        } : { x: 0, y: 0, width: 32, height: 32, collected: true }; 
         //palanca nivel 2
 
 

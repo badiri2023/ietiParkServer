@@ -101,7 +101,7 @@ class Sala {
             const worldInitData = this.getWorldData(); 
             ws.send(JSON.stringify({
                 type: "WORLD_INIT",
-                data: this.getWorldData() // Usamos el método que separamos antes
+                data: this.getWorldData() 
             }));
         } else {
             //
@@ -241,7 +241,7 @@ class Sala {
     addViewer(ws) {
         this.viewers.add(ws);
 
-        console.log("Observador conectado");
+        console.log("***Observador conectado***");
 
         ws.send(JSON.stringify({
         type: "WORLD_INIT",
@@ -268,7 +268,7 @@ class Sala {
             this.world.key.collected = true;
             this.world.key.holderId = p.id;
 
-            console.log(`${p.nickname} tiene la llave`);
+            console.log(`***${p.nickname} tiene la llave***`);
 
 
             this.broadcast("KEY_COLLECTED", {
@@ -284,7 +284,7 @@ class Sala {
             this.world.palanca.activated = true;
             if (this.world.plataformaActivable) {
                 this.world.plataformaActivable.visible = true;
-                console.log(`[ ¡PALANCA ACTIVADA! El jugador ${p.nickname} ha tocado la palanca`);
+                console.log(`\n***¡PALANCA ACTIVADA! El jugador ${p.nickname} ha tocado la palanca***`);
                 this.world.obstacles.push(this.world.plataformaActivable);
             }
 
